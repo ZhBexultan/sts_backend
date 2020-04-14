@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ENDPOINT = "/api/v1/admin/**";
     private static final String MODERATOR_ENDPOINT = "/api/v1/moderator/**";
     private static final String USER_ENDPOINT = "/api/v1/user/**";
-    private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+    private static final String LOGIN_ENDPOINT = "/";  /*/api/v1/auth/login*/
 
     @Bean
     @Override
@@ -35,8 +35,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(ADMIN_ENDPOINT, LOGIN_ENDPOINT).permitAll()
-                //.antMatchers(LOGIN_ENDPOINT).hasRole("ADMIN")
+                .antMatchers(LOGIN_ENDPOINT).permitAll()
+                .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
                 .antMatchers(MODERATOR_ENDPOINT).hasRole("MODERATOR")
                 .antMatchers(USER_ENDPOINT).hasRole("USER")
                 .anyRequest().authenticated()
