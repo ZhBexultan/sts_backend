@@ -13,12 +13,8 @@ import java.util.List;
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
-    private final ArticleRepository articleRepository;
-
     @Autowired
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
-    }
+    private ArticleRepository articleRepository;
 
     @Override
     public Article saveArticle(Article article) {

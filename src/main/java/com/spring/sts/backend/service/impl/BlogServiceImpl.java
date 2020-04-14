@@ -13,12 +13,8 @@ import java.util.List;
 @Slf4j
 public class BlogServiceImpl implements BlogService {
 
-    private final BlogRepository blogRepository;
-
     @Autowired
-    public BlogServiceImpl(BlogRepository blogRepository) {
-        this.blogRepository = blogRepository;
-    }
+    private BlogRepository blogRepository;
 
     @Override
     public Blog saveBlog(Blog blog) {

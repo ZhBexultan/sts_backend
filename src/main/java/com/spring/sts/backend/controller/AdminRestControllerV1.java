@@ -21,16 +21,14 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v1/admin/")
 public class AdminRestControllerV1 {
 
-    private final UserService userService;
-    private final ArticleService articleService;
-    private final BlogService blogService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    public AdminRestControllerV1(UserService userService, ArticleService articleService, BlogService blogService) {
-        this.userService = userService;
-        this.articleService = articleService;
-        this.blogService = blogService;
-    }
+    private ArticleService articleService;
+
+    @Autowired
+    private BlogService blogService;
 
     /****************************************  USER SERVICE  ****************************************/
     @PostMapping("user/")
