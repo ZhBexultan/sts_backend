@@ -19,7 +19,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     public void setUserService(UserService userService) {
-        System.out.println("JwtUserDetailsService - setUserService");
         this.userService = userService;
     }
 
