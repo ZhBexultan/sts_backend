@@ -20,7 +20,6 @@ public class UserDto {
         user.setUsername(username);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setEmail(email);
 
         return user;
     }
@@ -31,7 +30,6 @@ public class UserDto {
         userDto.setUsername(user.getUsername());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
-        userDto.setEmail(user.getEmail());
 
         return userDto;
     }

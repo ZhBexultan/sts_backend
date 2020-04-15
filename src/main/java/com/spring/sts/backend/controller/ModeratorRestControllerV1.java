@@ -1,6 +1,5 @@
 package com.spring.sts.backend.controller;
 
-import com.spring.sts.backend.dto.UserDto;
 import com.spring.sts.backend.entity.Blog;
 import com.spring.sts.backend.entity.User;
 import com.spring.sts.backend.service.BlogService;
@@ -13,52 +12,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/api/v1/user/")
-public class UserRestControllerV1 {
-
-    @Autowired
-    private UserService userService;
+@RequestMapping(value = "/api/v1/moderator/")
+public class ModeratorRestControllerV1 {
 
     @Autowired
     private BlogService blogService;
 
+    @Autowired
+    private UserService userService;
+
     /****************************************  USER SERVICE  ****************************************/
-    @PostMapping("user/")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        userService.register(user);
-        return new ResponseEntity<>(user, httpHeaders, HttpStatus.CREATED);
-    }
-
-    @GetMapping("user/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        User user = userService.findById(id);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        UserDto result = UserDto.fromUser(user);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @DeleteMapping("user/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
-        User user = userService.findById(id);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        userService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @PutMapping("user/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") User userFromDB,
                                            @RequestBody User user) {
@@ -71,6 +36,7 @@ public class UserRestControllerV1 {
         return new ResponseEntity<>(userFromDB, httpHeaders, HttpStatus.OK);
     }
 
+
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
     public ResponseEntity<List<Blog>> getAllBlogs() {
@@ -79,25 +45,6 @@ public class UserRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(blogs, HttpStatus.OK);
-    }
-
-    @GetMapping("/{userId}/blogs/")
-    public ResponseEntity<List<Blog>> getBlogsByUserId(@PathVariable Long userId) {
-        List<Blog> blogs = blogService.getBlogsByUserId(userId);
-        if (blogs.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(blogs, HttpStatus.OK);
-    }
-
-    @PostMapping("blog/")
-    public ResponseEntity<Blog> addBlog(@RequestBody Blog blog) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        blogService.saveBlog(blog);
-        return new ResponseEntity<>(blog, httpHeaders, HttpStatus.CREATED);
     }
 
     @GetMapping("blog/{id}")
@@ -110,16 +57,6 @@ public class UserRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(blog, HttpStatus.OK);
-    }
-
-    @DeleteMapping("blog/{id}")
-    public ResponseEntity<Blog> deleteBlog(@PathVariable Long id) {
-        Blog blog = blogService.getBlogById(id);
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        blogService.deleteBlog(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("blog/{id}")

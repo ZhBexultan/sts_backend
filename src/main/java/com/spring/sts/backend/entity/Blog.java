@@ -16,11 +16,15 @@ public class Blog extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id",nullable = false)
+    private User user;
 
 }
 

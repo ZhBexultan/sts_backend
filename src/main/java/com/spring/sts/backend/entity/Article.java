@@ -16,6 +16,9 @@ public class Article extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "content", nullable = false)
     private String content;
 
@@ -27,5 +30,9 @@ public class Article extends BaseEntity {
 
     @Column(name = "problem_id", nullable = false)
     private Long problemId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id",nullable = false)
+    private User user;
 
 }
