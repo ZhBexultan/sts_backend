@@ -27,9 +27,7 @@ public class UserRestControllerV1 {
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         User user = userService.findById(id);
-
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
