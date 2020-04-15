@@ -31,6 +31,7 @@ public class JwtTokenProvider {
 
     @Autowired
     public void setUserDetailsService(UserDetailsService userDetailsService) {
+        System.out.println("JwtTokenProvider - setUserDetailsService");
         this.userDetailsService = userDetailsService;
     }
 
