@@ -13,6 +13,7 @@ public class JwtUser implements UserDetails {
     private final String firstName;
     private final String lastName;
     private final String password;
+    private final String imageUrl;
     private final Collection<? extends GrantedAuthority> authority;
 
     public JwtUser(Long id,
@@ -20,12 +21,14 @@ public class JwtUser implements UserDetails {
                    String firstName,
                    String lastName,
                    String password,
+                   String imageUrl,
                    Collection<? extends GrantedAuthority> authority) {
         this.id = id;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.imageUrl = imageUrl;
         this.authority = authority;
     }
 
@@ -68,6 +71,10 @@ public class JwtUser implements UserDetails {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     @JsonIgnore

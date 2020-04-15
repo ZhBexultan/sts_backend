@@ -15,6 +15,7 @@ public final class JwtUserFactory {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getPassword(),
+                user.getImageUrl(),
                 Collections.singleton(user.getRole()));
     }
 

@@ -1,4 +1,4 @@
-package com.spring.sts.backend.security.jwt;
+package com.spring.sts.backend.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

@@ -1,6 +1,7 @@
 package com.spring.sts.backend.security.jwt;
 
 import com.spring.sts.backend.entity.Role;
+import com.spring.sts.backend.exception.JwtAuthenticationException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
