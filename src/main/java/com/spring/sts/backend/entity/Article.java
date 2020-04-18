@@ -16,9 +16,6 @@ public class Article extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     @Column(name = "content", nullable = false)
     private String content;
 

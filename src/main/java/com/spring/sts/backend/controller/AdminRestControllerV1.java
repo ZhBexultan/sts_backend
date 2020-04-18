@@ -1,6 +1,5 @@
 package com.spring.sts.backend.controller;
 
-import com.spring.sts.backend.dto.UserDto;
 import com.spring.sts.backend.entity.Article;
 import com.spring.sts.backend.entity.Blog;
 import com.spring.sts.backend.entity.User;
@@ -9,13 +8,13 @@ import com.spring.sts.backend.service.BlogService;
 import com.spring.sts.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/v1/admin/")
@@ -30,37 +29,68 @@ public class AdminRestControllerV1 {
     @Autowired
     private BlogService blogService;
 
+    /****************************************  ADMIN OWN SERVICE  ****************************************/
+    @GetMapping("/")
+    public ResponseEntity<User> getAdminById(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<User> deleteAdmin(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userService.delete(user.getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<User> updateAdmin(HttpServletRequest request,
+                                           @RequestBody User user) {
+        HttpSession session = request.getSession();
+        User userFromDB = (User) session.getAttribute("current_user");
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BeanUtils.copyProperties(user, userFromDB, "id");
+        userService.saveUser(userFromDB);
+        return new ResponseEntity<>(userFromDB, HttpStatus.OK);
+    }
+
+
     /****************************************  USER SERVICE  ****************************************/
-    @PostMapping("user/")
+    @PostMapping("user")
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        HttpHeaders httpHeaders = new HttpHeaders();
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userService.register(user);
-        return new ResponseEntity<>(user, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.findById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        UserDto result = UserDto.fromUser(user);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        List<UserDto> result = users.stream()
-                .map(UserDto::fromUser)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @DeleteMapping("user/{id}")
@@ -76,13 +106,12 @@ public class AdminRestControllerV1 {
     @PutMapping("user/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") User userFromDB,
                                                  @RequestBody User user) {
-        HttpHeaders httpHeaders = new HttpHeaders();
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         BeanUtils.copyProperties(user, userFromDB, "id");
         userService.saveUser(userFromDB);
-        return new ResponseEntity<>(userFromDB, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(userFromDB, HttpStatus.OK);
     }
 
 
@@ -96,14 +125,17 @@ public class AdminRestControllerV1 {
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
-    @PostMapping("article/")
-    public ResponseEntity<Article> addArticle(@RequestBody Article article) {
-        HttpHeaders httpHeaders = new HttpHeaders();
+    @PostMapping("article")
+    public ResponseEntity<Article> addArticle(@RequestBody Article article,
+                                              HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
         if (article == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        article.setUser(user);
         articleService.saveArticle(article);
-        return new ResponseEntity<>(article, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(article, HttpStatus.CREATED);
     }
 
     @GetMapping("article/{id}")
@@ -131,14 +163,17 @@ public class AdminRestControllerV1 {
     @PutMapping("article/{id}")
     public ResponseEntity<Article> updateArticle(@PathVariable("id") Article articleFromDB,
                                  @RequestBody Article article) {
-        HttpHeaders httpHeaders = new HttpHeaders();
+        articleFromDB = articleService.getArticleById(articleFromDB.getId());
+        User user = articleFromDB.getUser();
         if (article == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         BeanUtils.copyProperties(article, articleFromDB, "id");
+        articleFromDB.setUser(user);
         articleService.saveArticle(articleFromDB);
-        return new ResponseEntity<>(articleFromDB, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(articleFromDB, HttpStatus.OK);
     }
+
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
@@ -150,14 +185,17 @@ public class AdminRestControllerV1 {
         return new ResponseEntity<>(blogs, HttpStatus.OK);
     }
 
-    @PostMapping("blog/")
-    public ResponseEntity<Blog> addBlog(@RequestBody Blog blog) {
-        HttpHeaders httpHeaders = new HttpHeaders();
+    @PostMapping("blog")
+    public ResponseEntity<Blog> addBlog(@RequestBody Blog blog,
+                                        HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
         if (blog == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        blog.setUser(user);
         blogService.saveBlog(blog);
-        return new ResponseEntity<>(blog, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(blog, HttpStatus.CREATED);
     }
 
     @GetMapping("blog/{id}")
@@ -185,13 +223,15 @@ public class AdminRestControllerV1 {
     @PutMapping("blog/{id}")
     public ResponseEntity<Blog> updateBlog(@PathVariable("id") Blog blogFromDB,
                                                  @RequestBody Blog blog) {
-        HttpHeaders httpHeaders = new HttpHeaders();
+        blogFromDB = blogService.getBlogById(blogFromDB.getId());
+        User user = blogFromDB.getUser();
         if (blog == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         BeanUtils.copyProperties(blog, blogFromDB, "id");
+        blogFromDB.setUser(user);
         blogService.saveBlog(blogFromDB);
-        return new ResponseEntity<>(blogFromDB, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
     }
 
 }
