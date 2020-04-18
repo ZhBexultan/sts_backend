@@ -1,9 +1,11 @@
 package com.spring.sts.backend.service;
 
 import com.spring.sts.backend.entity.Article;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface ArticleService {
 
     Article saveArticle(Article article);
