@@ -1,7 +1,9 @@
 package com.spring.sts.backend.security.jwt;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -11,6 +13,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+@Component
 public class JwtTokenFilter extends GenericFilterBean {
 
     private JwtTokenProvider jwtTokenProvider;
