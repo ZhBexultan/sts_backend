@@ -1,19 +1,15 @@
 package com.spring.sts.backend.controller;
 
-import com.spring.sts.backend.entity.Article;
-import com.spring.sts.backend.entity.Blog;
-import com.spring.sts.backend.entity.Role;
-import com.spring.sts.backend.entity.User;
-import com.spring.sts.backend.service.ArticleService;
-import com.spring.sts.backend.service.BlogService;
-import com.spring.sts.backend.service.RandomizerUser;
-import com.spring.sts.backend.service.UserService;
+import com.spring.sts.backend.entity.*;
+import com.spring.sts.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "api/v1/unauthorized/")
@@ -27,6 +23,9 @@ public class UnauthorizedRestControllerV1 {
 
     @Autowired
     private BlogService blogService;
+
+    @Autowired
+    private ImageArticleService imageArticleService;
 
     /****************************************  USER SERVICE  ****************************************/
     @PostMapping("user")
@@ -51,6 +50,20 @@ public class UnauthorizedRestControllerV1 {
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
+    @GetMapping("lastArticles")
+    public ResponseEntity getLastThreeArticles() {
+        Map<Article, ImageArticle> result = new HashMap<>();
+        List<Article> articles = articleService.getLastThree();
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(article, firstImageArticle);
+        }
+        if (result.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     @GetMapping("article/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
         if (id == null) {
@@ -63,11 +76,66 @@ public class UnauthorizedRestControllerV1 {
         return new ResponseEntity<>(article, HttpStatus.OK);
     }
 
+    @GetMapping("articles/category/{categoryId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryId(@PathVariable Long categoryId) {
+        if (categoryId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodIdAndProblemId(
+            @PathVariable Long categoryId,
+            @PathVariable Long moodId,
+            @PathVariable Long problemId) {
+        if (categoryId == null || moodId == null || problemId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
+                moodId, problemId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/mood/{moodId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodId(
+            @PathVariable Long categoryId,
+            @PathVariable Long moodId) {
+        if (categoryId == null || moodId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/problem/{problemId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndProblemId(
+            @PathVariable Long categoryId,
+            @PathVariable Long problemId) {
+        if (categoryId == null || problemId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
     public ResponseEntity<List<Blog>> getAllBlogs() {
-        List<Blog> blogs = blogService.getAllBlogs();
+        List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
         if (blogs.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

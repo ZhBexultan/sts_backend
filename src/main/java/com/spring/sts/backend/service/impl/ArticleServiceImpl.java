@@ -55,9 +55,30 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<Article> getArticlesByCategoryIdAndMoodId(Long categoryId, Long moodId) {
+        List<Article> articles = articleRepository.findByCategoryIdAndMoodId(categoryId, moodId);
+        log.info("IN ArticleServiceImpl getArticlesByCategoryIdAndMoodId - {} articles found", articles.size());
+        return articles;
+    }
+
+    @Override
+    public List<Article> getArticlesByCategoryIdAndProblemId(Long categoryId, Long problemId) {
+        List<Article> articles = articleRepository.findByCategoryIdAndProblemId(categoryId, problemId);
+        log.info("IN ArticleServiceImpl getArticlesByCategoryIdAndProblemId - {} articles found", articles.size());
+        return articles;
+    }
+
+    @Override
     public List<Article> getAllArticles() {
         List<Article> articles = articleRepository.findAll();
         log.info("IN ArticleServiceImpl getAllArticles - {} articles found", articles.size());
+        return articles;
+    }
+
+    @Override
+    public List<Article> getLastThree() {
+        List<Article> articles = articleRepository.findLastThree();
+        log.info("IN ArticleServiceImpl getLastThree - {} articles found", articles.size());
         return articles;
     }
 }

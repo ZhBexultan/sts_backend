@@ -18,4 +18,9 @@ public interface BlogService {
 
     List<Blog> getAllBlogs();
 
+    List<Blog> getBlogsStatusIsAccepted();
+
+    List<Blog> getBlogsStatusIsCreated();
+
+    List<Blog> getBlogsStatusIsDenied();
 }

@@ -1,10 +1,9 @@
 package com.spring.sts.backend.controller;
 
-import com.spring.sts.backend.entity.Article;
-import com.spring.sts.backend.entity.Blog;
-import com.spring.sts.backend.entity.User;
+import com.spring.sts.backend.entity.*;
 import com.spring.sts.backend.service.ArticleService;
 import com.spring.sts.backend.service.BlogService;
+import com.spring.sts.backend.service.ImageArticleService;
 import com.spring.sts.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/user/")
@@ -28,6 +30,9 @@ public class UserRestControllerV1 {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private ImageArticleService imageArticleService;
 
     /****************************************  USER SERVICE  ****************************************/
     @GetMapping("/")
@@ -67,7 +72,7 @@ public class UserRestControllerV1 {
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
     public ResponseEntity<List<Blog>> getAllBlogs() {
-        List<Blog> blogs = blogService.getAllBlogs();
+        List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
         if (blogs.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -94,6 +99,9 @@ public class UserRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         blog.setUser(user);
+        blog.setCreatedDate(LocalDateTime.now());
+        blog.setStatus(Status.CREATED);
+        blog.setBlog(true);
         blogService.saveBlog(blog);
         return new ResponseEntity<>(blog, HttpStatus.CREATED);
     }
@@ -131,6 +139,8 @@ public class UserRestControllerV1 {
         }
         BeanUtils.copyProperties(blog, blogFromDB, "id");
         blogFromDB.setUser(user);
+        blogFromDB.setUpdatedDate(LocalDateTime.now());
+        blogFromDB.setStatus(Status.CREATED);
         blogService.saveBlog(blogFromDB);
         return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
     }
@@ -146,6 +156,24 @@ public class UserRestControllerV1 {
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
+    @GetMapping("lastArticles")
+    public ResponseEntity<List<Article>> getLastThreeArticles() {
+        List<Article> articles = articleService.getLastThree();
+        HashMap<Long, HashMap<Article, ImageArticle>> result = new HashMap<Long, HashMap<Article, ImageArticle>>();
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        for (Article article: articles) {
+            ImageArticle imageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            if (imageArticle != null) {
+                Map<Article, ImageArticle> articleMap = new HashMap<>();
+                articleMap.put(article, imageArticle);
+                result.put(article.getId(), null);
+            }
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
     @GetMapping("article/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
         if (id == null) {
@@ -156,6 +184,62 @@ public class UserRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(article, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryId(@PathVariable Long categoryId) {
+        if (categoryId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodIdAndProblemId(
+            @PathVariable Long categoryId,
+            @PathVariable Long moodId,
+            @PathVariable Long problemId) {
+        if (categoryId == null || moodId == null || problemId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
+                moodId, problemId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/mood/{moodId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodId(
+            @PathVariable Long categoryId,
+            @PathVariable Long moodId) {
+        if (categoryId == null || moodId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}/problem/{problemId}")
+    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndProblemId(
+            @PathVariable Long categoryId,
+            @PathVariable Long problemId) {
+        if (categoryId == null || problemId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
 }

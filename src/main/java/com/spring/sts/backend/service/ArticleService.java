@@ -20,6 +20,14 @@ public interface ArticleService {
                                                                Long moodId,
                                                                Long problemId);
 
+    List<Article> getArticlesByCategoryIdAndMoodId(Long categoryId,
+                                                   Long moodId);
+
+    List<Article> getArticlesByCategoryIdAndProblemId(Long categoryId,
+                                                   Long problemId);
+
     List<Article> getAllArticles();
+
+    List<Article> getLastThree();
 
 }

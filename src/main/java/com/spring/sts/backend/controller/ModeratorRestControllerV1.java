@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -81,6 +82,7 @@ public class ModeratorRestControllerV1 {
         }
         BeanUtils.copyProperties(blog, blogFromDB, "id");
         blogFromDB.setUser(user);
+        blogFromDB.setUpdatedDate(LocalDateTime.now());
         blogService.saveBlog(blogFromDB);
         return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
     }
