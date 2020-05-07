@@ -20,7 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String MODERATOR_ENDPOINT = "/api/v1/moderator/**";
     private static final String USER_ENDPOINT = "/api/v1/user/**";
     private static final String UNAUTHORIZED_ENDPOINT = "/api/v1/unauthorized/**";
-    private static final String LOGIN_ENDPOINT = "/api/v1/auth/*";
+    private static final String LOGIN_ENDPOINT = "/api/v1/auth/**";
 
     @Bean
     @Override
