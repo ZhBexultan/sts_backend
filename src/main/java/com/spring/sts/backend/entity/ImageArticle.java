@@ -17,7 +17,7 @@ import javax.persistence.Table;
 public class ImageArticle extends ImageBase {
 
     @ManyToOne
-    @JoinColumn(name = "article_id", nullable = false)
+    @JoinColumn(name = "article_id")
     private Article article;
 
 }

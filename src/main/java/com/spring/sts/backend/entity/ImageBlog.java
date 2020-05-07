@@ -17,7 +17,7 @@ import javax.persistence.Table;
 public class ImageBlog extends ImageBase {
 
     @ManyToOne
-    @JoinColumn(name = "blog_id", nullable = false)
+    @JoinColumn(name = "blog_id")
     private Blog blog;
 
 }

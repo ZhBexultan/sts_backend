@@ -1,12 +1,7 @@
 package com.spring.sts.backend.controller;
 
-import com.spring.sts.backend.entity.Article;
-import com.spring.sts.backend.entity.Blog;
-import com.spring.sts.backend.entity.Status;
-import com.spring.sts.backend.entity.User;
-import com.spring.sts.backend.service.ArticleService;
-import com.spring.sts.backend.service.BlogService;
-import com.spring.sts.backend.service.UserService;
+import com.spring.sts.backend.entity.*;
+import com.spring.sts.backend.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +25,15 @@ public class AdminRestControllerV1 {
 
     @Autowired
     private BlogService blogService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
+    private ImageBlogService imageBlogService;
+
+    @Autowired
+    private ImageArticleService imageArticleService;
 
     /****************************************  ADMIN OWN SERVICE  ****************************************/
     @GetMapping("/")
@@ -307,4 +311,153 @@ public class AdminRestControllerV1 {
         return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
     }
 
+
+    /****************************************  TAG SERVICE  ****************************************/
+    @PostMapping("tag")
+    public ResponseEntity<Tag> addTag(@RequestBody Tag tag) {
+        if (tag == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        tagService.saveTag(tag);
+        return new ResponseEntity<>(tag, HttpStatus.CREATED);
+    }
+
+    @GetMapping("tag/{id}")
+    public ResponseEntity<Tag> getTagById(@PathVariable Long id) {
+        Tag tag = tagService.findById(id);
+        if (tag == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(tag, HttpStatus.OK);
+    }
+
+    @GetMapping("tags")
+    public ResponseEntity<List<Tag>> getAllTags() {
+        List<Tag> tags = tagService.getAllTags();
+        if (tags.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
+    @DeleteMapping("tag/{id}")
+    public ResponseEntity<Tag> deleteTag(@PathVariable Long id) {
+        Tag tag = tagService.findById(id);
+        if (tag == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        tagService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("tag/{id}")
+    public ResponseEntity<Tag> updateTag(@PathVariable("id") Tag tagFromDB,
+                                           @RequestBody Tag tag) {
+        if (tag == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BeanUtils.copyProperties(tag, tagFromDB, "id");
+        tagService.saveTag(tagFromDB);
+        return new ResponseEntity<>(tagFromDB, HttpStatus.OK);
+    }
+
+
+    /****************************************  IMAGE ARTICLE SERVICE  ****************************************/
+    @PostMapping("imageArticle")
+    public ResponseEntity<ImageArticle> addImageArticle(@RequestBody ImageArticle imageArticle) {
+        if (imageArticle == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        imageArticleService.saveImageArticle(imageArticle);
+        return new ResponseEntity<>(imageArticle, HttpStatus.CREATED);
+    }
+
+    @GetMapping("imageArticle/{id}")
+    public ResponseEntity<ImageArticle> getImageArticleById(@PathVariable Long id) {
+        ImageArticle imageArticle = imageArticleService.getImageArticleById(id);
+        if (imageArticle == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(imageArticle, HttpStatus.OK);
+    }
+
+    @GetMapping("imageArticles")
+    public ResponseEntity<List<ImageArticle>> getAllImageArticles() {
+        List<ImageArticle> imageArticles = imageArticleService.getAllImageArticles();
+        if (imageArticles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(imageArticles, HttpStatus.OK);
+    }
+
+    @DeleteMapping("imageArticle/{id}")
+    public ResponseEntity<ImageArticle> deleteImageArticle(@PathVariable Long id) {
+        ImageArticle imageArticle = imageArticleService.getImageArticleById(id);
+        if (imageArticle == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        imageArticleService.deleteImageArticle(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("imageArticle/{id}")
+    public ResponseEntity<ImageArticle> updateImageArticle(@PathVariable("id") ImageArticle imageArticleFromDB,
+                                         @RequestBody ImageArticle imageArticle) {
+        if (imageArticle == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BeanUtils.copyProperties(imageArticle, imageArticleFromDB, "id");
+        imageArticleService.saveImageArticle(imageArticleFromDB);
+        return new ResponseEntity<>(imageArticleFromDB, HttpStatus.OK);
+    }
+
+
+    /****************************************  IMAGE BLOG SERVICE  ****************************************/
+    @PostMapping("imageBlog")
+    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog) {
+        if (imageBlog == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        imageBlogService.saveImageBlog(imageBlog);
+        return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
+    }
+
+    @GetMapping("imageBlog/{id}")
+    public ResponseEntity<ImageBlog> getImageBlogById(@PathVariable Long id) {
+        ImageBlog imageBlog = imageBlogService.getImageBlogById(id);
+        if (imageBlog == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(imageBlog, HttpStatus.OK);
+    }
+
+    @GetMapping("imageBlogs")
+    public ResponseEntity<List<ImageBlog>> getAllImageBlogs() {
+        List<ImageBlog> imageBlogs = imageBlogService.getAllImageBlogs();
+        if (imageBlogs.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(imageBlogs, HttpStatus.OK);
+    }
+
+    @DeleteMapping("imageBlog/{id}")
+    public ResponseEntity<ImageBlog> deleteImageBlog(@PathVariable Long id) {
+        ImageBlog imageBlog = imageBlogService.getImageBlogById(id);
+        if (imageBlog == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        imageBlogService.deleteImageBlog(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("imageBlog/{id}")
+    public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
+                                                           @RequestBody ImageBlog imageBlog) {
+        if (imageBlog == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
+        imageBlogService.saveImageBlog(imageBlogFromDB);
+        return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
+    }
 }
