@@ -161,11 +161,13 @@ public class UserRestControllerV1 {
 
     @GetMapping("lastArticles")
     public ResponseEntity getLastThreeArticles() {
-        Map<Article, ImageArticle> result = new HashMap<>();
+        Map<Integer, ImageArticle> result = new HashMap<>();
         List<Article> articles = articleService.getLastThree();
+        int count = 1;
         for (Article article: articles) {
             ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(article, firstImageArticle);
+            result.put(count, firstImageArticle);
+            count++;
         }
         if (result.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

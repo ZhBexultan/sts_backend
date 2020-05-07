@@ -39,7 +39,7 @@ public class Blog extends BaseEntity {
     private Status status;
 
     @ManyToMany(mappedBy = "blogs")
-    private Set<Tag> employees = new HashSet<>();
+    private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
