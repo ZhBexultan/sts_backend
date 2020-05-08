@@ -13,7 +13,7 @@ import javax.persistence.MappedSuperclass;
 @AllArgsConstructor
 public class ImageBase extends BaseEntity {
 
-    @Column(name = "url", nullable = false)
+    @Column(name = "url", nullable = false, length = 512)
     private String url;
 
 }

@@ -20,10 +20,10 @@ public class Blog extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 8000)
     private String content;
 
-    @Column(name = "short_content", nullable = false)
+    @Column(name = "short_content", nullable = false, length = 512)
     private String shortContent;
 
     @Column(name = "is_blog", nullable = false)

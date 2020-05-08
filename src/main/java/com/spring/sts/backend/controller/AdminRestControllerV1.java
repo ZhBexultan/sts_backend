@@ -125,36 +125,35 @@ public class AdminRestControllerV1 {
 
     /****************************************  ARTICLE SERVICE  ****************************************/
     @GetMapping("articles")
-    public ResponseEntity<List<Article>> getAllArticles() {
+    public ResponseEntity getAllArticles() {
         List<Article> articles = articleService.getAllArticles();
+        Map<Integer, ImageArticle> result = new HashMap<>();
+        int count = 1;
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(count, firstImageArticle);
+            count++;
+        }
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("lastArticles")
-    public ResponseEntity<List<Article>> getLastThreeArticles() {
+    public ResponseEntity getLastThreeArticles() {
+        Map<Integer, ImageArticle> result = new HashMap<>();
         List<Article> articles = articleService.getLastThree();
-        if (articles.isEmpty()) {
+        int count = 1;
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(count, firstImageArticle);
+            count++;
+        }
+        if (result.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
-    }
-
-    @PostMapping("article")
-    public ResponseEntity<Article> addArticle(@RequestBody Article article,
-                                              HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("current_user");
-        if (article == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        article.setUser(user);
-        article.setBlog(false);
-        article.setCreatedDate(LocalDateTime.now());
-        articleService.saveArticle(article);
-        return new ResponseEntity<>(article, HttpStatus.CREATED);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("article/{id}")
@@ -171,6 +170,40 @@ public class AdminRestControllerV1 {
         result.put("article", article);
         result.put("images", images);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("articles/category/{categoryId}")
+    public ResponseEntity getArticlesByCategoryId(@PathVariable Long categoryId) {
+        if (categoryId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
+        Map<Integer, ImageArticle> result = new HashMap<>();
+        int count = 1;
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(count, firstImageArticle);
+            count++;
+        }
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("article")
+    public ResponseEntity<Article> addArticle(@RequestBody Article article,
+                                              HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
+        if (article == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        article.setUser(user);
+        article.setBlog(false);
+        article.setCreatedDate(LocalDateTime.now());
+        articleService.saveArticle(article);
+        return new ResponseEntity<>(article, HttpStatus.CREATED);
     }
 
     @DeleteMapping("article/{id}")
@@ -198,18 +231,7 @@ public class AdminRestControllerV1 {
         return new ResponseEntity<>(articleFromDB, HttpStatus.OK);
     }
 
-    @GetMapping("articles/category/{categoryId}")
-    public ResponseEntity<List<Article>> getArticlesByCategoryId(@PathVariable Long categoryId) {
-        if (categoryId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
-        if (articles.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
-    }
-
+    /*
     @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
     public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodIdAndProblemId(
             @PathVariable Long categoryId,
@@ -253,6 +275,7 @@ public class AdminRestControllerV1 {
         }
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
+    */
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")

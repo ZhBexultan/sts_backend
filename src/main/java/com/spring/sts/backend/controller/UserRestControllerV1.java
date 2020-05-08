@@ -155,12 +155,19 @@ public class UserRestControllerV1 {
 
     /****************************************  ARTICLE SERVICE  ****************************************/
     @GetMapping("articles")
-    public ResponseEntity<List<Article>> getAllArticles() {
+    public ResponseEntity getAllArticles() {
         List<Article> articles = articleService.getAllArticles();
+        Map<Integer, ImageArticle> result = new HashMap<>();
+        int count = 1;
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(count, firstImageArticle);
+            count++;
+        }
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("lastArticles")
@@ -196,17 +203,25 @@ public class UserRestControllerV1 {
     }
 
     @GetMapping("articles/category/{categoryId}")
-    public ResponseEntity<List<Article>> getArticlesByCategoryId(@PathVariable Long categoryId) {
+    public ResponseEntity getArticlesByCategoryId(@PathVariable Long categoryId) {
         if (categoryId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
+        Map<Integer, ImageArticle> result = new HashMap<>();
+        int count = 1;
+        for (Article article: articles) {
+            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
+            result.put(count, firstImageArticle);
+            count++;
+        }
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /*
     @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
     public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodIdAndProblemId(
             @PathVariable Long categoryId,
@@ -250,6 +265,7 @@ public class UserRestControllerV1 {
         }
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
+    */
 
 
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
