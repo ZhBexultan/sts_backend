@@ -58,4 +58,11 @@ public class ImageBlogServiceImpl implements ImageBlogService {
         return imageBlog;
     }
 
+    @Override
+    public List<ImageBlog> getImageBlogsByBlogId(Long blogId) {
+        List<ImageBlog> images = imageBlogRepository.findByBlog_Id(blogId);
+        log.info("IN ImageBlogServiceImpl getImageBlogsByBlogId - {} images found", images.size());
+        return images;
+    }
+
 }

@@ -1,8 +1,10 @@
 package com.spring.sts.backend.controller;
 
 import com.spring.sts.backend.entity.Blog;
+import com.spring.sts.backend.entity.ImageBlog;
 import com.spring.sts.backend.entity.User;
 import com.spring.sts.backend.service.BlogService;
+import com.spring.sts.backend.service.ImageBlogService;
 import com.spring.sts.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/moderator/")
@@ -24,6 +28,9 @@ public class ModeratorRestControllerV1 {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ImageBlogService imageBlogService;
 
     /****************************************  USER SERVICE  ****************************************/
     @GetMapping("/")
@@ -61,7 +68,8 @@ public class ModeratorRestControllerV1 {
     }
 
     @GetMapping("blog/{id}")
-    public ResponseEntity<Blog> getBlogById(@PathVariable Long id) {
+    public ResponseEntity getBlogById(@PathVariable Long id) {
+        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -69,7 +77,10 @@ public class ModeratorRestControllerV1 {
         if (blog == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(blog, HttpStatus.OK);
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
+        result.put("blog", blog);
+        result.put("images", images);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping("blog/{id}")

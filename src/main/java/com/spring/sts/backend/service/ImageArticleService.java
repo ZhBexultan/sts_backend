@@ -18,4 +18,6 @@ public interface ImageArticleService {
 
     List<ImageArticle> getAllImageArticles();
 
+    List<ImageArticle> getImageArticlesByArticleId(Long articleId);
+
 }

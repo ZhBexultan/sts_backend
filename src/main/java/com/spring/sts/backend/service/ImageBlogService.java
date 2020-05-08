@@ -18,4 +18,6 @@ public interface ImageBlogService {
 
     List<ImageBlog> getAllImageBlogs();
 
+    List<ImageBlog> getImageBlogsByBlogId(Long blogId);
+
 }

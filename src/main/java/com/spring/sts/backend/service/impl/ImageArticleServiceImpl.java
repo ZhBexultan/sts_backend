@@ -58,4 +58,11 @@ public class ImageArticleServiceImpl implements ImageArticleService {
         return imageArticle;
     }
 
+    @Override
+    public List<ImageArticle> getImageArticlesByArticleId(Long articleId) {
+        List<ImageArticle> images = imageArticleRepository.findByArticle_Id(articleId);
+        log.info("IN ImageArticleServiceImpl getImageArticlesByArticleId - {} images found", images.size());
+        return images;
+    }
+
 }

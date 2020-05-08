@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/admin/")
@@ -156,7 +158,8 @@ public class AdminRestControllerV1 {
     }
 
     @GetMapping("article/{id}")
-    public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
+    public ResponseEntity getArticleById(@PathVariable Long id) {
+        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -164,7 +167,10 @@ public class AdminRestControllerV1 {
         if (article == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(article, HttpStatus.OK);
+        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
+        result.put("article", article);
+        result.put("images", images);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("article/{id}")
@@ -275,7 +281,8 @@ public class AdminRestControllerV1 {
     }
 
     @GetMapping("blog/{id}")
-    public ResponseEntity<Blog> getBlogById(@PathVariable Long id) {
+    public ResponseEntity getBlogById(@PathVariable Long id) {
+        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -283,7 +290,10 @@ public class AdminRestControllerV1 {
         if (blog == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(blog, HttpStatus.OK);
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
+        result.put("blog", blog);
+        result.put("images", images);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("blog/{id}")
