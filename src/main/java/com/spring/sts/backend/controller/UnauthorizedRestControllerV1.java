@@ -1,5 +1,6 @@
 package com.spring.sts.backend.controller;
 
+import com.spring.sts.backend.dto.*;
 import com.spring.sts.backend.entity.*;
 import com.spring.sts.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,49 +49,45 @@ public class UnauthorizedRestControllerV1 {
     @GetMapping("articles")
     public ResponseEntity getAllArticles() {
         List<Article> articles = articleService.getAllArticles();
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("lastArticles")
     public ResponseEntity getLastThreeArticles() {
-        Map<Integer, ImageArticle> result = new HashMap<>();
         List<Article> articles = articleService.getLastThree();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (result.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("article/{id}")
     public ResponseEntity getArticleById(@PathVariable Long id) {
-        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Article article = articleService.getArticleById(id);
-        if (article == null) {
+        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
+        ArticleDto articleDto = ArticleDto.fromArticle(article, images);
+        if (articleDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
-        result.put("article", article);
-        result.put("images", images);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}")
@@ -98,20 +96,18 @@ public class UnauthorizedRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
-    /*
     @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
     public ResponseEntity getArticlesByCategoryIdAndMoodIdAndProblemId(
             @PathVariable Long categoryId,
@@ -122,17 +118,16 @@ public class UnauthorizedRestControllerV1 {
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
                 moodId, problemId);
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}/mood/{moodId}")
@@ -143,17 +138,16 @@ public class UnauthorizedRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}/problem/{problemId}")
@@ -164,44 +158,47 @@ public class UnauthorizedRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
-    */
+
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
-    public ResponseEntity<List<Blog>> getAllBlogs() {
+    public ResponseEntity getAllBlogs() {
         List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
-        if (blogs.isEmpty()) {
+        List<BlogShortDto> blogShortDtos = new ArrayList<>();
+        for (Blog blog: blogs) {
+            ImageBlogDto firstImageBlogDto =
+                    ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
+            blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
+        }
+        if (blogShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(blogs, HttpStatus.OK);
+        return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Blog blog = blogService.getBlogById(id);
-        if (blog == null) {
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
+        BlogDto blogDto = BlogDto.fromBlog(blog, images);
+        if (blogDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
-        result.put("blog", blog);
-        result.put("images", images);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
 }

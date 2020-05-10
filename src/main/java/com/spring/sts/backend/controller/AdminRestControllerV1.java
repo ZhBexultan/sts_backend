@@ -1,5 +1,6 @@
 package com.spring.sts.backend.controller;
 
+import com.spring.sts.backend.dto.*;
 import com.spring.sts.backend.entity.*;
 import com.spring.sts.backend.service.*;
 import org.springframework.beans.BeanUtils;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,21 +86,26 @@ public class AdminRestControllerV1 {
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userService.findById(id);
+        UserDto userDto = UserDto.fromUser(user);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
     @GetMapping("users")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> usersDto = new ArrayList<>();
         List<User> users = userService.getAllUsers();
+        for (User user: users) {
+            usersDto.add(UserDto.fromUser(user));
+        }
         if (users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(usersDto, HttpStatus.OK);
     }
 
     @DeleteMapping("user/{id}")
@@ -127,49 +134,45 @@ public class AdminRestControllerV1 {
     @GetMapping("articles")
     public ResponseEntity getAllArticles() {
         List<Article> articles = articleService.getAllArticles();
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("lastArticles")
     public ResponseEntity getLastThreeArticles() {
-        Map<Integer, ImageArticle> result = new HashMap<>();
         List<Article> articles = articleService.getLastThree();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (result.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("article/{id}")
     public ResponseEntity getArticleById(@PathVariable Long id) {
-        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Article article = articleService.getArticleById(id);
-        if (article == null) {
+        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
+        ArticleDto articleDto = ArticleDto.fromArticle(article, images);
+        if (articleDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
-        result.put("article", article);
-        result.put("images", images);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}")
@@ -178,17 +181,16 @@ public class AdminRestControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
-        Map<Integer, ImageArticle> result = new HashMap<>();
-        int count = 1;
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
-            ImageArticle firstImageArticle = imageArticleService.getImageArticleByArticleId(article.getId());
-            result.put(count, firstImageArticle);
-            count++;
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articles.isEmpty()) {
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @PostMapping("article")
@@ -231,9 +233,8 @@ public class AdminRestControllerV1 {
         return new ResponseEntity<>(articleFromDB, HttpStatus.OK);
     }
 
-    /*
     @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
-    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodIdAndProblemId(
+    public ResponseEntity getArticlesByCategoryIdAndMoodIdAndProblemId(
             @PathVariable Long categoryId,
             @PathVariable Long moodId,
             @PathVariable Long problemId) {
@@ -242,49 +243,87 @@ public class AdminRestControllerV1 {
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
                 moodId, problemId);
-        if (articles.isEmpty()) {
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
+        for (Article article: articles) {
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
+        }
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}/mood/{moodId}")
-    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndMoodId(
+    public ResponseEntity getArticlesByCategoryIdAndMoodId(
             @PathVariable Long categoryId,
             @PathVariable Long moodId) {
         if (categoryId == null || moodId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
-        if (articles.isEmpty()) {
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
+        for (Article article: articles) {
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
+        }
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}/problem/{problemId}")
-    public ResponseEntity<List<Article>> getArticlesByCategoryIdAndProblemId(
+    public ResponseEntity getArticlesByCategoryIdAndProblemId(
             @PathVariable Long categoryId,
             @PathVariable Long problemId) {
         if (categoryId == null || problemId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
-        if (articles.isEmpty()) {
+        List<ArticleShortDto> articleShortDtos = new ArrayList<>();
+        for (Article article: articles) {
+            ImageArticleDto firstImageArticleDto =
+                    ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
+            articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
+        }
+        if (articleShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
-    */
+
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
-    public ResponseEntity<List<Blog>> getAllBlogs() {
-        List<Blog> blogs = blogService.getAllBlogs();
-        if (blogs.isEmpty()) {
+    public ResponseEntity getAllBlogs() {
+        List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
+        List<BlogShortDto> blogShortDtos = new ArrayList<>();
+        for (Blog blog: blogs) {
+            ImageBlogDto firstImageBlogDto =
+                    ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
+            blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
+        }
+        if (blogShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(blogs, HttpStatus.OK);
+        return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("blog/{id}")
+    public ResponseEntity getBlogById(@PathVariable Long id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Blog blog = blogService.getBlogById(id);
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
+        BlogDto blogDto = BlogDto.fromBlog(blog, images);
+        if (blogDto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
     @PostMapping("blog")
@@ -301,22 +340,6 @@ public class AdminRestControllerV1 {
         blog.setStatus(Status.ACCEPTED);
         blogService.saveBlog(blog);
         return new ResponseEntity<>(blog, HttpStatus.CREATED);
-    }
-
-    @GetMapping("blog/{id}")
-    public ResponseEntity getBlogById(@PathVariable Long id) {
-        Map<String, Object> result = new HashMap<>();
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        Blog blog = blogService.getBlogById(id);
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
-        result.put("blog", blog);
-        result.put("images", images);
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("blog/{id}")

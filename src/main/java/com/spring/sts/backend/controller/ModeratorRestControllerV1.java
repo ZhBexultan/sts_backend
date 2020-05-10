@@ -1,5 +1,8 @@
 package com.spring.sts.backend.controller;
 
+import com.spring.sts.backend.dto.BlogDto;
+import com.spring.sts.backend.dto.BlogShortDto;
+import com.spring.sts.backend.dto.ImageBlogDto;
 import com.spring.sts.backend.entity.Blog;
 import com.spring.sts.backend.entity.ImageBlog;
 import com.spring.sts.backend.entity.User;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,28 +63,32 @@ public class ModeratorRestControllerV1 {
 
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
-    public ResponseEntity<List<Blog>> getAllBlogs() {
-        List<Blog> blogs = blogService.getAllBlogs();
-        if (blogs.isEmpty()) {
+    public ResponseEntity getAllBlogs() {
+        List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
+        List<BlogShortDto> blogShortDtos = new ArrayList<>();
+        for (Blog blog: blogs) {
+            ImageBlogDto firstImageBlogDto =
+                    ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
+            blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
+        }
+        if (blogShortDtos.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(blogs, HttpStatus.OK);
+        return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        Map<String, Object> result = new HashMap<>();
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Blog blog = blogService.getBlogById(id);
-        if (blog == null) {
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
+        BlogDto blogDto = BlogDto.fromBlog(blog, images);
+        if (blogDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
-        result.put("blog", blog);
-        result.put("images", images);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
     @PutMapping("blog/{id}")
