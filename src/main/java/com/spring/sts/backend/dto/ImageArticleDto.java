@@ -17,8 +17,10 @@ public class ImageArticleDto {
 
     public static ImageArticleDto fromImageArticle(ImageArticle imageArticle) {
         ImageArticleDto imageArticleDto = new ImageArticleDto();
-        imageArticleDto.setId(imageArticle.getId());
-        imageArticleDto.setUrl(imageArticle.getUrl());
+        if (imageArticle != null) {
+            imageArticleDto.setId(imageArticle.getId());
+            imageArticleDto.setUrl(imageArticle.getUrl());
+        }
         return  imageArticleDto;
     }
 

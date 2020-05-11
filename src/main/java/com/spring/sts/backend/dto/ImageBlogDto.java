@@ -17,8 +17,11 @@ public class ImageBlogDto {
 
     public static ImageBlogDto fromImageBlog(ImageBlog imageBlog) {
         ImageBlogDto imageBlogDto = new ImageBlogDto();
-        imageBlogDto.setId(imageBlog.getId());
-        imageBlogDto.setUrl(imageBlog.getUrl());
+        if (imageBlog != null) {
+
+            imageBlogDto.setId(imageBlog.getId());
+            imageBlogDto.setUrl(imageBlog.getUrl());
+        }
         return  imageBlogDto;
     }
 

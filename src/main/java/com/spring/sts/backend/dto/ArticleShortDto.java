@@ -13,6 +13,9 @@ import java.util.List;
 public class ArticleShortDto {
 
     private Long id;
+    private Long categoryId;
+    private Long moodId;
+    private Long problemId;
     private String title;
     private String shortContent;
     private LocalDateTime createdDate;
@@ -25,6 +28,9 @@ public class ArticleShortDto {
     public static ArticleShortDto fromArticle(Article article, ImageArticleDto image) {
         ArticleShortDto articleShortDto = new ArticleShortDto();
         articleShortDto.setId(article.getId());
+        articleShortDto.setCategoryId(article.getCategoryId());
+        articleShortDto.setMoodId(article.getMoodId());
+        articleShortDto.setProblemId(article.getProblemId());
         articleShortDto.setTitle(article.getTitle());
         articleShortDto.setShortContent(article.getShortContent());
         articleShortDto.setCreatedDate(article.getCreatedDate());

@@ -17,7 +17,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findByCategoryIdAndProblemId(Long categoryId, Long problemId);
 
     @Query(
-            value = "SELECT * FROM sts_article ORDER BY created_date DESC LIMIT 3",
+            value = "SELECT * FROM sts_article WHERE category_id != 1 ORDER BY created_date DESC LIMIT 3",
             nativeQuery = true
     )
     List<Article> findLastThree();
