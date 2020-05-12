@@ -2,6 +2,9 @@ package com.spring.sts.backend.service.impl;
 
 import com.spring.sts.backend.entity.Role;
 import com.spring.sts.backend.entity.User;
+import com.spring.sts.backend.exception.BodyIsNullException;
+import com.spring.sts.backend.exception.NoReturnDataException;
+import com.spring.sts.backend.exception.ObjectNotFoundException;
 import com.spring.sts.backend.repository.UserRepository;
 import com.spring.sts.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(User user) {
+        if (user.getUsername() == null || user.getPassword() == null) {
+            throw new BodyIsNullException("User", "username, password");
+        }
         user.setRole(Role.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User registeredUser = userRepository.save(user);
@@ -38,34 +44,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
+        if (user.getUsername() == null || user.getPassword() == null) {
+            throw new BodyIsNullException("User", "username, password");
+        }
         User savedUser = userRepository.save(user);
         log.info("IN UserServiceImpl saveUser - user: {} successfully saved", savedUser);
         return savedUser;
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        log.info("IN UserServiceImpl getAllUsers - {} users found", users.size());
-        return users;
-    }
-
-    @Override
-    public User findByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        log.info("IN UserServiceImpl findByUsername - user: {} found by username: {}", user, username);
-        return user;
-    }
-
-    @Override
-    public User findById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            log.warn("IN UserServiceImpl findById - no user found by id: {}", id);
-            return null;
-        }
-        log.info("IN UserServiceImpl findById - user: {} found by id: {}", user, id);
-        return user;
     }
 
     @Override
@@ -73,4 +57,32 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         log.info("IN UserServiceImpl delete - user with id: {} successfully deleted", id);
     }
+
+    @Override
+    public User findById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("User", id));
+        log.info("IN UserServiceImpl findById - user: {} found by id: {}", user, id);
+        return user;
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ObjectNotFoundException("User", "username");
+        }
+        log.info("IN UserServiceImpl findByUsername - user: {} found by username: {}", user, username);
+        return user;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new NoReturnDataException("Users");
+        }
+        log.info("IN UserServiceImpl getAllUsers - {} users found", users.size());
+        return users;
+    }
+
 }

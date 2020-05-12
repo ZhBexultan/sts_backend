@@ -19,9 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/moderator/")
@@ -52,9 +50,6 @@ public class ModeratorRestControllerV1 {
                                            HttpServletRequest request) {
         HttpSession session = request.getSession();
         User userFromDB = (User) session.getAttribute("current_user");
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(user, userFromDB, "id");
         userService.saveUser(userFromDB);
         return new ResponseEntity<>(userFromDB, HttpStatus.OK);
@@ -64,30 +59,21 @@ public class ModeratorRestControllerV1 {
     /****************************************  BLOG SERVICE  ****************************************/
     @GetMapping("blogs")
     public ResponseEntity getAllBlogs() {
-        List<Blog> blogs = blogService.getBlogsStatusIsAccepted();
+        List<Blog> blogs = blogService.getAllBlogs();
         List<BlogShortDto> blogShortDtos = new ArrayList<>();
         for (Blog blog: blogs) {
             ImageBlogDto firstImageBlogDto =
                     ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
             blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
         }
-        if (blogShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         Blog blog = blogService.getBlogById(id);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
-        if (blogDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
@@ -96,9 +82,6 @@ public class ModeratorRestControllerV1 {
                                            @RequestBody Blog blog) {
         blogFromDB = blogService.getBlogById(blogFromDB.getId());
         User user = blogFromDB.getUser();
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(blog, blogFromDB, "id");
         blogFromDB.setUser(user);
         blogFromDB.setUpdatedDate(LocalDateTime.now());

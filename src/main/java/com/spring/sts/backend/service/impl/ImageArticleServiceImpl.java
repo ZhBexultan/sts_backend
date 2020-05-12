@@ -1,6 +1,9 @@
 package com.spring.sts.backend.service.impl;
 
 import com.spring.sts.backend.entity.ImageArticle;
+import com.spring.sts.backend.exception.BodyIsNullException;
+import com.spring.sts.backend.exception.NoReturnDataException;
+import com.spring.sts.backend.exception.ObjectNotFoundException;
 import com.spring.sts.backend.repository.ImageArticleRepository;
 import com.spring.sts.backend.service.ImageArticleService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,25 +20,10 @@ public class ImageArticleServiceImpl implements ImageArticleService {
     private ImageArticleRepository imageArticleRepository;
 
     @Override
-    public ImageArticle getImageArticleByArticleId(Long articleId) {
-        ImageArticle imageArticle = imageArticleRepository.findFirstByArticle_Id(articleId);
-        if (imageArticle == null) {
-            log.warn("IN ImageArticleServiceImpl getImageArticleByArticleId - no imageArticle found by id: {}", articleId);
-            return null;
-        }
-        log.info("IN ImageArticleServiceImpl getImageArticleByArticleId - imageArticle: {} found by id: {}", imageArticle, articleId);
-        return imageArticle;
-    }
-
-    @Override
-    public List<ImageArticle> getAllImageArticles() {
-        List<ImageArticle> imageArticles = imageArticleRepository.findAll();
-        log.info("IN ImageArticleServiceImpl getAllImageArticles - {} tags found", imageArticles.size());
-        return imageArticles;
-    }
-
-    @Override
     public ImageArticle saveImageArticle(ImageArticle imageArticle) {
+        if (imageArticle.getUrl() == null) {
+            throw new BodyIsNullException("ImageArticle", "url");
+        }
         ImageArticle savedImageArticle = imageArticleRepository.save(imageArticle);
         log.info("IN ImageArticleServiceImpl saveImageArticle - imageArticle: {} successfully saved", savedImageArticle);
         return savedImageArticle;
@@ -49,13 +37,24 @@ public class ImageArticleServiceImpl implements ImageArticleService {
 
     @Override
     public ImageArticle getImageArticleById(Long id) {
-        ImageArticle imageArticle = imageArticleRepository.findById(id).orElse(null);
-        if (imageArticle == null) {
-            log.warn("IN ImageArticleServiceImpl getImageArticleById - no imageArticle found by id: {}", id);
-            return null;
-        }
+        ImageArticle imageArticle = imageArticleRepository.findById(id).orElseThrow(() ->
+                new ObjectNotFoundException("ImageArticle", id));
         log.info("IN ImageArticleServiceImpl getImageArticleById - imageArticle: {} found by id: {}", imageArticle, id);
         return imageArticle;
+    }
+
+    @Override
+    public ImageArticle getImageArticleByArticleId(Long articleId) {
+        ImageArticle imageArticle = imageArticleRepository.findFirstByArticle_Id(articleId);
+        log.info("IN ImageArticleServiceImpl getImageArticleByArticleId - imageArticle: {} found by id: {}", imageArticle, articleId);
+        return imageArticle;
+    }
+
+    @Override
+    public List<ImageArticle> getAllImageArticles() {
+        List<ImageArticle> imageArticles = imageArticleRepository.findAll();
+        log.info("IN ImageArticleServiceImpl getAllImageArticles - {} tags found", imageArticles.size());
+        return imageArticles;
     }
 
     @Override

@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/user/")
@@ -54,9 +52,6 @@ public class UserRestControllerV1 {
     public ResponseEntity<User> deleteUser(HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         userService.delete(user.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -66,9 +61,6 @@ public class UserRestControllerV1 {
                                            @RequestBody User user) {
         HttpSession session = request.getSession();
         User userFromDB = (User) session.getAttribute("current_user");
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(user, userFromDB, "id");
         userService.saveUser(userFromDB);
         return new ResponseEntity<>(userFromDB, HttpStatus.OK);
@@ -84,23 +76,14 @@ public class UserRestControllerV1 {
                     ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
             blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
         }
-        if (blogShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         Blog blog = blogService.getBlogById(id);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
-        if (blogDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
@@ -115,9 +98,6 @@ public class UserRestControllerV1 {
                     ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
             blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
         }
-        if (blogShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
@@ -126,9 +106,6 @@ public class UserRestControllerV1 {
                                         HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         blog.setUser(user);
         blog.setCreatedDate(LocalDateTime.now());
         blog.setStatus(Status.CREATED);
@@ -140,9 +117,6 @@ public class UserRestControllerV1 {
     @DeleteMapping("blog/{id}")
     public ResponseEntity<Blog> deleteBlog(@PathVariable Long id) {
         Blog blog = blogService.getBlogById(id);
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         blogService.deleteBlog(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -153,9 +127,6 @@ public class UserRestControllerV1 {
                                            HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(blog, blogFromDB, "id");
         blogFromDB.setUser(user);
         blogFromDB.setUpdatedDate(LocalDateTime.now());
@@ -175,9 +146,6 @@ public class UserRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
@@ -190,40 +158,25 @@ public class UserRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("article/{id}")
     public ResponseEntity getArticleById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         Article article = articleService.getArticleById(id);
         List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
         ArticleDto articleDto = ArticleDto.fromArticle(article, images);
-        if (articleDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}")
     public ResponseEntity getArticlesByCategoryId(@PathVariable Long categoryId) {
-        if (categoryId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -233,9 +186,6 @@ public class UserRestControllerV1 {
             @PathVariable Long categoryId,
             @PathVariable Long moodId,
             @PathVariable Long problemId) {
-        if (categoryId == null || moodId == null || problemId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
                 moodId, problemId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
@@ -244,9 +194,6 @@ public class UserRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
@@ -254,18 +201,12 @@ public class UserRestControllerV1 {
     public ResponseEntity getArticlesByCategoryIdAndMoodId(
             @PathVariable Long categoryId,
             @PathVariable Long moodId) {
-        if (categoryId == null || moodId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -274,18 +215,12 @@ public class UserRestControllerV1 {
     public ResponseEntity getArticlesByCategoryIdAndProblemId(
             @PathVariable Long categoryId,
             @PathVariable Long problemId) {
-        if (categoryId == null || problemId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -294,9 +229,6 @@ public class UserRestControllerV1 {
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
     @PostMapping("imageBlog")
     public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog) {
-        if (imageBlog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         imageBlogService.saveImageBlog(imageBlog);
         return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
     }
@@ -304,27 +236,18 @@ public class UserRestControllerV1 {
     @GetMapping("imageBlog/{id}")
     public ResponseEntity<ImageBlog> getImageBlogById(@PathVariable Long id) {
         ImageBlog imageBlog = imageBlogService.getImageBlogById(id);
-        if (imageBlog == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
         return new ResponseEntity<>(imageBlog, HttpStatus.OK);
     }
 
     @GetMapping("imageBlogs")
     public ResponseEntity<List<ImageBlog>> getAllImageBlogs() {
         List<ImageBlog> imageBlogs = imageBlogService.getAllImageBlogs();
-        if (imageBlogs.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
         return new ResponseEntity<>(imageBlogs, HttpStatus.OK);
     }
 
     @DeleteMapping("imageBlog/{id}")
     public ResponseEntity<ImageBlog> deleteImageBlog(@PathVariable Long id) {
         ImageBlog imageBlog = imageBlogService.getImageBlogById(id);
-        if (imageBlog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         imageBlogService.deleteImageBlog(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -332,9 +255,6 @@ public class UserRestControllerV1 {
     @PutMapping("imageBlog/{id}")
     public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
                                                      @RequestBody ImageBlog imageBlog) {
-        if (imageBlog == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
         imageBlogService.saveImageBlog(imageBlogFromDB);
         return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
@@ -344,9 +264,6 @@ public class UserRestControllerV1 {
     /****************************************  TAG SERVICE  ****************************************/
     @PostMapping("tag")
     public ResponseEntity<Tag> addTag(@RequestBody Tag tag) {
-        if (tag == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         tagService.saveTag(tag);
         return new ResponseEntity<>(tag, HttpStatus.CREATED);
     }
@@ -354,27 +271,18 @@ public class UserRestControllerV1 {
     @GetMapping("tag/{id}")
     public ResponseEntity<Tag> getTagById(@PathVariable Long id) {
         Tag tag = tagService.findById(id);
-        if (tag == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
         return new ResponseEntity<>(tag, HttpStatus.OK);
     }
 
     @GetMapping("tags")
     public ResponseEntity<List<Tag>> getAllTags() {
         List<Tag> tags = tagService.getAllTags();
-        if (tags.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 
     @DeleteMapping("tag/{id}")
     public ResponseEntity<Tag> deleteTag(@PathVariable Long id) {
         Tag tag = tagService.findById(id);
-        if (tag == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         tagService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -382,9 +290,6 @@ public class UserRestControllerV1 {
     @PutMapping("tag/{id}")
     public ResponseEntity<Tag> updateTag(@PathVariable("id") Tag tagFromDB,
                                          @RequestBody Tag tag) {
-        if (tag == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         BeanUtils.copyProperties(tag, tagFromDB, "id");
         tagService.saveTag(tagFromDB);
         return new ResponseEntity<>(tagFromDB, HttpStatus.OK);

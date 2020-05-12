@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "api/v1/unauthorized/")
@@ -35,9 +33,6 @@ public class UnauthorizedRestControllerV1 {
     /****************************************  USER SERVICE  ****************************************/
     @PostMapping("user")
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         user.setFirstName("User@"+RandomizerUser.generate());
         user.setLastName("Anonymous");
         user.setRole(Role.ROLE_USER);
@@ -55,9 +50,6 @@ public class UnauthorizedRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
@@ -70,40 +62,25 @@ public class UnauthorizedRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("article/{id}")
     public ResponseEntity getArticleById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         Article article = articleService.getArticleById(id);
         List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(article.getId());
         ArticleDto articleDto = ArticleDto.fromArticle(article, images);
-        if (articleDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}")
     public ResponseEntity getArticlesByCategoryId(@PathVariable Long categoryId) {
-        if (categoryId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryId(categoryId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -113,9 +90,6 @@ public class UnauthorizedRestControllerV1 {
             @PathVariable Long categoryId,
             @PathVariable Long moodId,
             @PathVariable Long problemId) {
-        if (categoryId == null || moodId == null || problemId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodIdAndProblemId(categoryId,
                 moodId, problemId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
@@ -124,9 +98,6 @@ public class UnauthorizedRestControllerV1 {
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
         }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
 
@@ -134,18 +105,12 @@ public class UnauthorizedRestControllerV1 {
     public ResponseEntity getArticlesByCategoryIdAndMoodId(
             @PathVariable Long categoryId,
             @PathVariable Long moodId) {
-        if (categoryId == null || moodId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndMoodId(categoryId, moodId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -154,18 +119,12 @@ public class UnauthorizedRestControllerV1 {
     public ResponseEntity getArticlesByCategoryIdAndProblemId(
             @PathVariable Long categoryId,
             @PathVariable Long problemId) {
-        if (categoryId == null || problemId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         List<Article> articles = articleService.getArticlesByCategoryIdAndProblemId(categoryId, problemId);
         List<ArticleShortDto> articleShortDtos = new ArrayList<>();
         for (Article article: articles) {
             ImageArticleDto firstImageArticleDto =
                     ImageArticleDto.fromImageArticle(imageArticleService.getImageArticleByArticleId(article.getId()));
             articleShortDtos.add(ArticleShortDto.fromArticle(article, firstImageArticleDto));
-        }
-        if (articleShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(articleShortDtos, HttpStatus.OK);
     }
@@ -181,23 +140,14 @@ public class UnauthorizedRestControllerV1 {
                     ImageBlogDto.fromImageBlog(imageBlogService.getImageBlogByBlogId(blog.getId()));
             blogShortDtos.add(BlogShortDto.fromBlog(blog, firstImageBlogDto));
         }
-        if (blogShortDtos.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogShortDtos, HttpStatus.OK);
     }
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        if (id == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         Blog blog = blogService.getBlogById(id);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
-        if (blogDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 

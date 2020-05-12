@@ -12,6 +12,7 @@ public class BlogShortDto {
 
     private Long id;
     private String title;
+    private String content;
     private String shortContent;
     private LocalDateTime createdDate;
     private ImageBlogDto image;
@@ -24,6 +25,7 @@ public class BlogShortDto {
         BlogShortDto blogShortDto = new BlogShortDto();
         blogShortDto.setId(blog.getId());
         blogShortDto.setTitle(blog.getTitle());
+        blogShortDto.setContent(blog.getContent());
         blogShortDto.setShortContent(blog.getShortContent());
         blogShortDto.setCreatedDate(blog.getCreatedDate());
         blogShortDto.setImage(image);
