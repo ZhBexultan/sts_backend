@@ -2,11 +2,13 @@ package com.spring.sts.backend.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -27,6 +29,9 @@ public class User extends BaseEntity {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name = "firebase_id", length = 8000)
+    private String firebaseId;
 
     @Enumerated(EnumType.STRING)
     private Role role;

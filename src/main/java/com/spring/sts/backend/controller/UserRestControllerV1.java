@@ -108,7 +108,6 @@ public class UserRestControllerV1 {
         User user = (User) session.getAttribute("current_user");
         blog.setUser(user);
         blog.setCreatedDate(LocalDateTime.now());
-        blog.setStatus(Status.CREATED);
         blog.setBlog(true);
         blogService.saveBlog(blog);
         return new ResponseEntity<>(blog, HttpStatus.CREATED);
@@ -130,7 +129,6 @@ public class UserRestControllerV1 {
         BeanUtils.copyProperties(blog, blogFromDB, "id");
         blogFromDB.setUser(user);
         blogFromDB.setUpdatedDate(LocalDateTime.now());
-        blogFromDB.setStatus(Status.CREATED);
         blogService.saveBlog(blogFromDB);
         return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
     }

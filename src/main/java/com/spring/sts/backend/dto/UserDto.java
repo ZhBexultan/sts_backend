@@ -13,6 +13,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String imageUrl;
+    private String firebaseId;
 
     public User toUser() {
         User user = new User();
@@ -31,6 +32,7 @@ public class UserDto {
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
         userDto.setImageUrl(user.getImageUrl());
+        userDto.setFirebaseId(user.getFirebaseId());
         return userDto;
     }
 

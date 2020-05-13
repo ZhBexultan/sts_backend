@@ -92,4 +92,14 @@ public class BlogServiceImpl implements BlogService {
         log.info("IN BlogServiceImpl getBlogsStatusIsDenied - {} blogs found", blogs.size());
         return blogs;
     }
+
+    @Override
+    public List<Blog> getBlogsStatusIsDraft() {
+        List<Blog> blogs = blogRepository.findBlogsByStatus(Status.DRAFT);
+        if (blogs.isEmpty()) {
+            throw new NoReturnDataException("Draft Blogs");
+        }
+        log.info("IN BlogServiceImpl getBlogsStatusIsDraft - {} blogs found", blogs.size());
+        return blogs;
+    }
 }

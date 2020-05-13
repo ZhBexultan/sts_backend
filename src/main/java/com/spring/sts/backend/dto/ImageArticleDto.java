@@ -10,6 +10,7 @@ public class ImageArticleDto {
 
     private Long id;
     private String url;
+    private String firebaseId;
 
     public ImageArticle toImageArticle() {
         return new ImageArticle();
@@ -20,6 +21,7 @@ public class ImageArticleDto {
         if (imageArticle != null) {
             imageArticleDto.setId(imageArticle.getId());
             imageArticleDto.setUrl(imageArticle.getUrl());
+            imageArticleDto.setFirebaseId(imageArticle.getFirebaseId());
         }
         return  imageArticleDto;
     }

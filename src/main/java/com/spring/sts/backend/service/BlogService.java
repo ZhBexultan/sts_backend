@@ -23,4 +23,6 @@ public interface BlogService {
     List<Blog> getBlogsStatusIsCreated();
 
     List<Blog> getBlogsStatusIsDenied();
+
+    List<Blog> getBlogsStatusIsDraft();
 }
