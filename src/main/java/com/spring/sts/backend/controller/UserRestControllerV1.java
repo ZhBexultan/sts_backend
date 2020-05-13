@@ -225,8 +225,11 @@ public class UserRestControllerV1 {
 
 
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
-    @PostMapping("imageBlog")
-    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog) {
+    @PostMapping("imageBlog/{blogId}")
+    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog,
+                                                  @PathVariable Long blogId) {
+        Blog blog = blogService.getBlogById(blogId);
+        imageBlog.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlog);
         return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
     }

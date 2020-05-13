@@ -257,9 +257,6 @@ public class AdminRestControllerV1 {
                                         HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
-        if (blog == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         blog.setUser(user);
         blog.setCreatedDate(LocalDateTime.now());
         blog.setBlog(true);
@@ -324,8 +321,11 @@ public class AdminRestControllerV1 {
 
 
     /****************************************  IMAGE ARTICLE SERVICE  ****************************************/
-    @PostMapping("imageArticle")
-    public ResponseEntity<ImageArticle> addImageArticle(@RequestBody ImageArticle imageArticle) {
+    @PostMapping("imageArticle/{articleId}")
+    public ResponseEntity<ImageArticle> addImageArticle(@RequestBody ImageArticle imageArticle,
+                                                        @PathVariable Long articleId) {
+        Article article = articleService.getArticleById(articleId);
+        imageArticle.setArticle(article);
         imageArticleService.saveImageArticle(imageArticle);
         return new ResponseEntity<>(imageArticle, HttpStatus.CREATED);
     }
@@ -359,8 +359,11 @@ public class AdminRestControllerV1 {
 
 
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
-    @PostMapping("imageBlog")
-    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog) {
+    @PostMapping("imageBlog/{blogId}")
+    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog,
+                                                  @PathVariable Long blogId) {
+        Blog blog = blogService.getBlogById(blogId);
+        imageBlog.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlog);
         return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
     }
