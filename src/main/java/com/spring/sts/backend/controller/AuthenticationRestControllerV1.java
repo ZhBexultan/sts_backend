@@ -51,7 +51,6 @@ public class AuthenticationRestControllerV1 {
             session.setAttribute("current_user", user);
             Cookie cookie = new Cookie("user_token", token);
             cookie.setMaxAge(3600000);
-            cookie.setHttpOnly(false);
             response.addCookie(cookie);
 
             Map<Object, Object> result = new HashMap<>();
