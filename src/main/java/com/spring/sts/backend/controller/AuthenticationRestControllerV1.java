@@ -52,16 +52,10 @@ public class AuthenticationRestControllerV1 {
             Cookie cookie = new Cookie("user_token", token);
             cookie.setMaxAge(3600000);
             response.addCookie(cookie);
-
             Map<Object, Object> result = new HashMap<>();
-            String returnUrl = "/";
-            if (user.getRole().getIndex()==1) {
-                returnUrl = "admin.html";
-            }
             result.put("username", username);
             result.put("token", token);
             result.put("user", user.getRole().getIndex());
-            result.put("url", returnUrl);
             return ResponseEntity.ok(result);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
