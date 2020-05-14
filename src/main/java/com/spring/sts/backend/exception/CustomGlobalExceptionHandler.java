@@ -22,7 +22,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         HttpStatus status = HttpStatus.NOT_FOUND;
         CustomErrorResponse errors = new CustomErrorResponse();
         errors.setTimestamp(LocalDateTime.now());
-        errors.setError(e.getMessage());
+        errors.setMessage(e.getMessage());
         errors.setStatus(status.value());
         return new ResponseEntity<>(errors, status);
     }
@@ -34,7 +34,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         HttpStatus status = HttpStatus.BAD_REQUEST;
         CustomErrorResponse errors = new CustomErrorResponse();
         errors.setTimestamp(LocalDateTime.now());
-        errors.setError(e.getMessage());
+        errors.setMessage(e.getMessage());
         errors.setStatus(status.value());
         return new ResponseEntity<>(errors, status);
     }
@@ -46,7 +46,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         HttpStatus status = HttpStatus.NO_CONTENT;
         CustomErrorResponse errors = new CustomErrorResponse();
         errors.setTimestamp(LocalDateTime.now());
-        errors.setError(e.getMessage());
+        errors.setMessage(e.getMessage());
         errors.setStatus(status.value());
         return new ResponseEntity<>(errors, status);
     }
