@@ -25,7 +25,8 @@ public class ArticleServiceImpl implements ArticleService {
                 || article.getContent() == null
                 || article.getShortContent() == null
                 || article.getCategoryId() == null
-                || article.getProblemId() == null) {
+                || article.getProblemId() == null
+                || article.getUser() == null) {
             throw new BodyIsNullException("Article", "title, content, shortContent, categoryId, problemId");
         }
         Article savedArticle = articleRepository.save(article);

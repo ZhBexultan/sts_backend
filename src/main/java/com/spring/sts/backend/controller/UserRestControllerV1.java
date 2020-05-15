@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -62,7 +61,7 @@ public class UserRestControllerV1 {
                                            @RequestBody User user) {
         HttpSession session = request.getSession();
         User userFromDB = (User) session.getAttribute("current_user");
-        BeanUtils.copyProperties(user, userFromDB, "id");
+        BeanUtils.copyProperties(user, userFromDB, "id", "username");
         userService.saveUser(userFromDB);
         return new ResponseEntity<>(userFromDB, HttpStatus.OK);
     }
@@ -103,7 +102,7 @@ public class UserRestControllerV1 {
     }
 
     @PostMapping("blog")
-    public ResponseEntity<Blog> addBlog(@RequestBody Blog blog,
+    public ResponseEntity addBlog(@RequestBody Blog blog,
                                         HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
@@ -122,16 +121,16 @@ public class UserRestControllerV1 {
     }
 
     @PutMapping("blog/{id}")
-    public ResponseEntity<Blog> updateBlog(@PathVariable("id") Blog blogFromDB,
+    public ResponseEntity updateBlog(@PathVariable("id") Blog blogFromDB,
                                            @RequestBody Blog blog,
                                            HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("current_user");
-        BeanUtils.copyProperties(blog, blogFromDB, "id");
-        blogFromDB.setUser(user);
+        BeanUtils.copyProperties(blog, blogFromDB, "id", "createdDate", "user");
         blogFromDB.setUpdatedDate(LocalDateTime.now());
+        blogFromDB.setBlog(true);
         blogService.saveBlog(blogFromDB);
-        return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blogFromDB.getId());
+        BlogDto blogDto = BlogDto.fromBlog(blogFromDB, images);
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
 
@@ -227,12 +226,13 @@ public class UserRestControllerV1 {
 
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
     @PostMapping("imageBlog/{blogId}")
-    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog,
+    public ResponseEntity addImageBlog(@RequestBody ImageBlog imageBlog,
                                                   @PathVariable Long blogId) {
         Blog blog = blogService.getBlogById(blogId);
         imageBlog.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlog);
-        return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
+        ImageBlogDto imageBlogDto = ImageBlogDto.fromImageBlog(imageBlog);
+        return new ResponseEntity<>(imageBlogDto, HttpStatus.CREATED);
     }
 
     @GetMapping("imageBlog/{id}")
@@ -255,14 +255,12 @@ public class UserRestControllerV1 {
     }
 
     @PutMapping("imageBlog/{id}")
-    public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
+    public ResponseEntity updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
                                                      @RequestBody ImageBlog imageBlog) {
-        imageBlogFromDB = imageBlogService.getImageBlogById(imageBlogFromDB.getId());
-        Blog blog = imageBlogFromDB.getBlog();
-        BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
-        imageBlogFromDB.setBlog(blog);
+        BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id", "blog");
         imageBlogService.saveImageBlog(imageBlogFromDB);
-        return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
+        ImageBlogDto imageBlogDto = ImageBlogDto.fromImageBlog(imageBlogFromDB);
+        return new ResponseEntity<>(imageBlogDto, HttpStatus.OK);
     }
 
 

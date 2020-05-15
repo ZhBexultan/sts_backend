@@ -27,7 +27,7 @@ public class BlogServiceImpl implements BlogService {
                 || blog.getShortContent() == null
                 || blog.getStatus() == null
                 || blog.getUser() == null) {
-            throw new BodyIsNullException("Blog", "title, content, shortContent, status, user");
+            throw new BodyIsNullException("Blog", "title, content, shortContent, status");
         }
         Blog savedBlog = blogRepository.save(blog);
         log.info("IN BlogServiceImpl saveBlog - blog: {} successfully saved", savedBlog);

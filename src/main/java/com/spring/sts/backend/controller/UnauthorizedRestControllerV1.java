@@ -32,12 +32,13 @@ public class UnauthorizedRestControllerV1 {
 
     /****************************************  USER SERVICE  ****************************************/
     @PostMapping("user")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity addUser(@RequestBody User user) {
         user.setFirstName("User@"+RandomizerUser.generate());
         user.setLastName("Anonymous");
         user.setRole(Role.ROLE_USER);
         userService.register(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        UserDto userDto = UserDto.fromUser(user);
+        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
     }
 
     /****************************************  ARTICLE SERVICE  ****************************************/

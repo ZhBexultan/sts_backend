@@ -156,7 +156,7 @@ public class AdminRestControllerV1 {
     }
 
     @PostMapping("article")
-    public ResponseEntity<Article> addArticle(@RequestBody Article article,
+    public ResponseEntity addArticle(@RequestBody Article article,
                                               HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
@@ -175,15 +175,15 @@ public class AdminRestControllerV1 {
     }
 
     @PutMapping("article/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable("id") Article articleFromDB,
+    public ResponseEntity updateArticle(@PathVariable("id") Article articleFromDB,
                                  @RequestBody Article article) {
-        articleFromDB = articleService.getArticleById(articleFromDB.getId());
-        User user = articleFromDB.getUser();
-        BeanUtils.copyProperties(article, articleFromDB, "id");
-        articleFromDB.setUser(user);
+        BeanUtils.copyProperties(article, articleFromDB, "id", "createdDate", "user");
         articleFromDB.setUpdatedDate(LocalDateTime.now());
+        articleFromDB.setBlog(false);
         articleService.saveArticle(articleFromDB);
-        return new ResponseEntity<>(articleFromDB, HttpStatus.OK);
+        List<ImageArticle> images = imageArticleService.getImageArticlesByArticleId(articleFromDB.getId());
+        ArticleDto articleDto = ArticleDto.fromArticle(articleFromDB, images);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("articles/category/{categoryId}/mood/{moodId}/problem/{problemId}")
@@ -253,7 +253,7 @@ public class AdminRestControllerV1 {
     }
 
     @PostMapping("blog")
-    public ResponseEntity<Blog> addBlog(@RequestBody Blog blog,
+    public ResponseEntity addBlog(@RequestBody Blog blog,
                                         HttpServletRequest request) {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("current_user");
@@ -273,15 +273,15 @@ public class AdminRestControllerV1 {
     }
 
     @PutMapping("blog/{id}")
-    public ResponseEntity<Blog> updateBlog(@PathVariable("id") Blog blogFromDB,
+    public ResponseEntity updateBlog(@PathVariable("id") Blog blogFromDB,
                                                  @RequestBody Blog blog) {
-        blogFromDB = blogService.getBlogById(blogFromDB.getId());
-        User user = blogFromDB.getUser();
-        BeanUtils.copyProperties(blog, blogFromDB, "id");
-        blogFromDB.setUser(user);
+        BeanUtils.copyProperties(blog, blogFromDB, "id", "createdDate", "user");
         blogFromDB.setUpdatedDate(LocalDateTime.now());
+        blogFromDB.setBlog(true);
         blogService.saveBlog(blogFromDB);
-        return new ResponseEntity<>(blogFromDB, HttpStatus.OK);
+        List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blogFromDB.getId());
+        BlogDto blogDto = BlogDto.fromBlog(blogFromDB, images);
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
 
@@ -322,12 +322,13 @@ public class AdminRestControllerV1 {
 
     /****************************************  IMAGE ARTICLE SERVICE  ****************************************/
     @PostMapping("imageArticle/{articleId}")
-    public ResponseEntity<ImageArticle> addImageArticle(@RequestBody ImageArticle imageArticle,
+    public ResponseEntity addImageArticle(@RequestBody ImageArticle imageArticle,
                                                         @PathVariable Long articleId) {
         Article article = articleService.getArticleById(articleId);
         imageArticle.setArticle(article);
         imageArticleService.saveImageArticle(imageArticle);
-        return new ResponseEntity<>(imageArticle, HttpStatus.CREATED);
+        ImageArticleDto imageArticleDto = ImageArticleDto.fromImageArticle(imageArticle);
+        return new ResponseEntity<>(imageArticleDto, HttpStatus.CREATED);
     }
 
     @GetMapping("imageArticle/{id}")
@@ -350,25 +351,24 @@ public class AdminRestControllerV1 {
     }
 
     @PutMapping("imageArticle/{id}")
-    public ResponseEntity<ImageArticle> updateImageArticle(@PathVariable("id") ImageArticle imageArticleFromDB,
+    public ResponseEntity updateImageArticle(@PathVariable("id") ImageArticle imageArticleFromDB,
                                          @RequestBody ImageArticle imageArticle) {
-        imageArticleFromDB = imageArticleService.getImageArticleById(imageArticleFromDB.getId());
-        Article article = imageArticleFromDB.getArticle();
-        BeanUtils.copyProperties(imageArticle, imageArticleFromDB, "id");
-        imageArticleFromDB.setArticle(article);
+        BeanUtils.copyProperties(imageArticle, imageArticleFromDB, "id", "article");
         imageArticleService.saveImageArticle(imageArticleFromDB);
-        return new ResponseEntity<>(imageArticleFromDB, HttpStatus.OK);
+        ImageArticleDto imageArticleDto = ImageArticleDto.fromImageArticle(imageArticleFromDB);
+        return new ResponseEntity<>(imageArticleDto, HttpStatus.OK);
     }
 
 
     /****************************************  IMAGE BLOG SERVICE  ****************************************/
     @PostMapping("imageBlog/{blogId}")
-    public ResponseEntity<ImageBlog> addImageBlog(@RequestBody ImageBlog imageBlog,
+    public ResponseEntity addImageBlog(@RequestBody ImageBlog imageBlog,
                                                   @PathVariable Long blogId) {
         Blog blog = blogService.getBlogById(blogId);
         imageBlog.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlog);
-        return new ResponseEntity<>(imageBlog, HttpStatus.CREATED);
+        ImageBlogDto imageBlogDto = ImageBlogDto.fromImageBlog(imageBlog);
+        return new ResponseEntity<>(imageBlogDto, HttpStatus.CREATED);
     }
 
     @GetMapping("imageBlog/{id}")
@@ -391,13 +391,11 @@ public class AdminRestControllerV1 {
     }
 
     @PutMapping("imageBlog/{id}")
-    public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
+    public ResponseEntity updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
                                                            @RequestBody ImageBlog imageBlog) {
-        imageBlogFromDB = imageBlogService.getImageBlogById(imageBlogFromDB.getId());
-        Blog blog = imageBlogFromDB.getBlog();
-        BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
-        imageBlogFromDB.setBlog(blog);
+        BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id", "blog");
         imageBlogService.saveImageBlog(imageBlogFromDB);
-        return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
+        ImageBlogDto imageBlogDto = ImageBlogDto.fromImageBlog(imageBlogFromDB);
+        return new ResponseEntity<>(imageBlogDto, HttpStatus.OK);
     }
 }

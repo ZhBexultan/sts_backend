@@ -2,7 +2,6 @@ package com.spring.sts.backend.service.impl;
 
 import com.spring.sts.backend.entity.ImageArticle;
 import com.spring.sts.backend.exception.BodyIsNullException;
-import com.spring.sts.backend.exception.NoReturnDataException;
 import com.spring.sts.backend.exception.ObjectNotFoundException;
 import com.spring.sts.backend.repository.ImageArticleRepository;
 import com.spring.sts.backend.service.ImageArticleService;
