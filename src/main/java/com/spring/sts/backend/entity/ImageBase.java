@@ -18,7 +18,7 @@ class ImageBase extends BaseEntity {
     @Column(name = "firebase_id", length = 8000)
     private String firebaseId;
 
-    @Column(name = "url", nullable = false, length = 512)
+    @Column(name = "url", length = 512)
     private String url;
 
 }

@@ -16,35 +16,35 @@ import java.time.LocalDateTime;
 @Table(name = "sts_article")
 public class Article extends BaseEntity {
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "content", nullable = false, length = 8000)
+    @Column(name = "content", length = 8000)
     private String content;
 
-    @Column(name = "short_content", nullable = false, length = 512)
+    @Column(name = "short_content", length = 512)
     private String shortContent;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "category_id")
     private Long categoryId;
 
     @Column(name = "mood_id")
     private Long moodId;
 
-    @Column(name = "problem_id", nullable = false)
+    @Column(name = "problem_id")
     private Long problemId;
 
-    @Column(name = "is_blog", nullable = false)
+    @Column(name = "is_blog")
     private boolean isBlog = false;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

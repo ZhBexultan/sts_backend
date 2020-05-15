@@ -18,25 +18,25 @@ import java.util.Set;
 @Table(name = "sts_blog")
 public class Blog extends BaseEntity {
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "content", nullable = false, length = 8000)
+    @Column(name = "content", length = 8000)
     private String content;
 
-    @Column(name = "short_content", nullable = false, length = 512)
+    @Column(name = "short_content", length = 512)
     private String shortContent;
 
-    @Column(name = "is_blog", nullable = false)
+    @Column(name = "is_blog")
     private boolean isBlog;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -44,7 +44,7 @@ public class Blog extends BaseEntity {
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
 }

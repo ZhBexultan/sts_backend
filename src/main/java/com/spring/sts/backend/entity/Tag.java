@@ -17,7 +17,7 @@ import java.util.Set;
 @Table(name = "sts_tag")
 public class Tag extends BaseEntity{
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @ManyToMany(cascade = { CascadeType.ALL })

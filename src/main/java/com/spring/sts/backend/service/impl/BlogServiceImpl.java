@@ -22,8 +22,12 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Blog saveBlog(Blog blog) {
-        if (blog.getTitle() == null || blog.getContent() == null || blog.getShortContent() == null) {
-            throw new BodyIsNullException("Blog", "title, content, shortContent");
+        if (blog.getTitle() == null
+                || blog.getContent() == null
+                || blog.getShortContent() == null
+                || blog.getStatus() == null
+                || blog.getUser() == null) {
+            throw new BodyIsNullException("Blog", "title, content, shortContent, status, user");
         }
         Blog savedBlog = blogRepository.save(blog);
         log.info("IN BlogServiceImpl saveBlog - blog: {} successfully saved", savedBlog);

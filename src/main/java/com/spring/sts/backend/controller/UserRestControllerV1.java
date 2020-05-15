@@ -257,7 +257,10 @@ public class UserRestControllerV1 {
     @PutMapping("imageBlog/{id}")
     public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
                                                      @RequestBody ImageBlog imageBlog) {
+        imageBlogFromDB = imageBlogService.getImageBlogById(imageBlogFromDB.getId());
+        Blog blog = imageBlogFromDB.getBlog();
         BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
+        imageBlogFromDB.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlogFromDB);
         return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
     }

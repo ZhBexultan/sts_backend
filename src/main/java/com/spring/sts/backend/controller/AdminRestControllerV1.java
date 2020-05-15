@@ -352,7 +352,10 @@ public class AdminRestControllerV1 {
     @PutMapping("imageArticle/{id}")
     public ResponseEntity<ImageArticle> updateImageArticle(@PathVariable("id") ImageArticle imageArticleFromDB,
                                          @RequestBody ImageArticle imageArticle) {
+        imageArticleFromDB = imageArticleService.getImageArticleById(imageArticleFromDB.getId());
+        Article article = imageArticleFromDB.getArticle();
         BeanUtils.copyProperties(imageArticle, imageArticleFromDB, "id");
+        imageArticleFromDB.setArticle(article);
         imageArticleService.saveImageArticle(imageArticleFromDB);
         return new ResponseEntity<>(imageArticleFromDB, HttpStatus.OK);
     }
@@ -390,7 +393,10 @@ public class AdminRestControllerV1 {
     @PutMapping("imageBlog/{id}")
     public ResponseEntity<ImageBlog> updateImageBlog(@PathVariable("id") ImageBlog imageBlogFromDB,
                                                            @RequestBody ImageBlog imageBlog) {
+        imageBlogFromDB = imageBlogService.getImageBlogById(imageBlogFromDB.getId());
+        Blog blog = imageBlogFromDB.getBlog();
         BeanUtils.copyProperties(imageBlog, imageBlogFromDB, "id");
+        imageBlogFromDB.setBlog(blog);
         imageBlogService.saveImageBlog(imageBlogFromDB);
         return new ResponseEntity<>(imageBlogFromDB, HttpStatus.OK);
     }
