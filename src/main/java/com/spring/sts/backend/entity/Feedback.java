@@ -23,7 +23,6 @@ public class Feedback extends BaseEntity {
     private LocalDateTime createdDate;
 
     @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    private String type;
 
 }

@@ -308,27 +308,9 @@ public class UserRestControllerV1 {
     /****************************************  FEEDBACK SERVICE  ****************************************/
     @PostMapping("feedback")
     public ResponseEntity<Feedback> addFeedback(@RequestBody Feedback feedback) {
+        feedback.setCreatedDate(LocalDateTime.now());
         feedbackService.saveFeedback(feedback);
         return new ResponseEntity<>(feedback, HttpStatus.CREATED);
-    }
-
-    @GetMapping("feedback/{id}")
-    public ResponseEntity<Feedback> getFeedbackById(@PathVariable Long id) {
-        Feedback feedback = feedbackService.findById(id);
-        return new ResponseEntity<>(feedback, HttpStatus.OK);
-    }
-
-    @GetMapping("feedbacks")
-    public ResponseEntity<List<Feedback>> getAllFeedbacks() {
-        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
-        return new ResponseEntity<>(feedbacks, HttpStatus.OK);
-    }
-
-    @DeleteMapping("feedback/{id}")
-    public ResponseEntity<Feedback> deleteFeedback(@PathVariable Long id) {
-        Feedback feedback = feedbackService.findById(id);
-        feedbackService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("feedback/{id}")

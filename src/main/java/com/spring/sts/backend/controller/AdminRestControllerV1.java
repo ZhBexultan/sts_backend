@@ -37,6 +37,9 @@ public class AdminRestControllerV1 {
     @Autowired
     private ImageArticleService imageArticleService;
 
+    @Autowired
+    private FeedbackService feedbackService;
+
     /****************************************  ADMIN OWN SERVICE  ****************************************/
     @GetMapping("/")
     public ResponseEntity<User> getAdminById(HttpServletRequest request) {
@@ -401,4 +404,26 @@ public class AdminRestControllerV1 {
         ImageBlogDto imageBlogDto = ImageBlogDto.fromImageBlog(imageBlogFromDB);
         return new ResponseEntity<>(imageBlogDto, HttpStatus.OK);
     }
+
+
+    /****************************************  FEEDBACK SERVICE  ****************************************/
+    @GetMapping("feedback/{id}")
+    public ResponseEntity<Feedback> getFeedbackById(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        return new ResponseEntity<>(feedback, HttpStatus.OK);
+    }
+
+    @GetMapping("feedbacks")
+    public ResponseEntity<List<Feedback>> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+        return new ResponseEntity<>(feedbacks, HttpStatus.OK);
+    }
+
+    @DeleteMapping("feedback/{id}")
+    public ResponseEntity<Feedback> deleteFeedback(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        feedbackService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

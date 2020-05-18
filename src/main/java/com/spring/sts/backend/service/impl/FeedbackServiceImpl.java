@@ -21,8 +21,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback saveFeedback(Feedback feedback) {
-        if (feedback.getComment() == null) {
-            throw new BodyIsNullException("Feedback", "comment");
+        if (feedback.getComment() == null || feedback.getType() == null) {
+            throw new BodyIsNullException("Feedback", "comment, type");
         }
         Feedback savedFeedback = feedbackRepository.save(feedback);
         log.info("IN FeedbackServiceImpl saveFeedback - feedback: {} successfully saved", savedFeedback);

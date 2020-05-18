@@ -47,8 +47,10 @@ public class BlogServiceImpl implements BlogService {
     public Blog getBlogById(Long id, User user) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Blog", id));
         if (user.getRole().equals(Role.ROLE_USER)) {
-            if (!blog.getStatus().equals(Status.ACCEPTED) || !blog.getUser().getId().equals(user.getId())) {
-                throw new AccessDeniedException();
+            if (!blog.getStatus().equals(Status.ACCEPTED)) {
+                if (!blog.getUser().getId().equals(user.getId())) {
+                    throw new AccessDeniedException();
+                }
             }
         }
         log.info("IN BlogServiceImpl getBlogById - blog: {} found by id: {}", blog, id);

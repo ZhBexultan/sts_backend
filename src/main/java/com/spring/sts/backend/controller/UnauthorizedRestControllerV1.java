@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class UnauthorizedRestControllerV1 {
         user.setLastName("Anonymous");
         user.setRole(Role.ROLE_USER);
         user.setFirebaseId("anon_user");
-        user.setImageUrl("https://firebasestorage.googleapis.com/v0/b/soul-to-soul.appspot.com/o/Kids/uncertainty.svg?alt=media&token=f3749f28-7f54-4bbd-bcbd-11c906084fab");
+        user.setImageUrl("https://firebasestorage.googleapis.com/v0/b/soul-to-soul.appspot.com/o/Kids%2Funcertainty.svg?alt=media&token=f3749f28-7f54-4bbd-bcbd-11c906084fab");
         userService.register(user);
         UserDto userDto = UserDto.fromUser(user);
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
@@ -165,27 +166,9 @@ public class UnauthorizedRestControllerV1 {
     /****************************************  FEEDBACK SERVICE  ****************************************/
     @PostMapping("feedback")
     public ResponseEntity<Feedback> addFeedback(@RequestBody Feedback feedback) {
+        feedback.setCreatedDate(LocalDateTime.now());
         feedbackService.saveFeedback(feedback);
         return new ResponseEntity<>(feedback, HttpStatus.CREATED);
-    }
-
-    @GetMapping("feedback/{id}")
-    public ResponseEntity<Feedback> getFeedbackById(@PathVariable Long id) {
-        Feedback feedback = feedbackService.findById(id);
-        return new ResponseEntity<>(feedback, HttpStatus.OK);
-    }
-
-    @GetMapping("feedbacks")
-    public ResponseEntity<List<Feedback>> getAllFeedbacks() {
-        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
-        return new ResponseEntity<>(feedbacks, HttpStatus.OK);
-    }
-
-    @DeleteMapping("feedback/{id}")
-    public ResponseEntity<Feedback> deleteFeedback(@PathVariable Long id) {
-        Feedback feedback = feedbackService.findById(id);
-        feedbackService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("feedback/{id}")
