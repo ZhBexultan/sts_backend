@@ -37,6 +37,9 @@ public class UserRestControllerV1 {
     @Autowired
     private ImageBlogService imageBlogService;
 
+    @Autowired
+    private FeedbackService feedbackService;
+
     /****************************************  USER SERVICE  ****************************************/
     @GetMapping("/")
     public ResponseEntity<User> getUserById(HttpServletRequest request) {
@@ -80,8 +83,11 @@ public class UserRestControllerV1 {
     }
 
     @GetMapping("blog/{id}")
-    public ResponseEntity getBlogById(@PathVariable Long id) {
-        Blog blog = blogService.getBlogById(id);
+    public ResponseEntity getBlogById(@PathVariable Long id,
+                                      HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
+        Blog blog = blogService.getBlogById(id, user);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
@@ -298,4 +304,38 @@ public class UserRestControllerV1 {
         return new ResponseEntity<>(tagFromDB, HttpStatus.OK);
     }
 
+
+    /****************************************  FEEDBACK SERVICE  ****************************************/
+    @PostMapping("feedback")
+    public ResponseEntity<Feedback> addFeedback(@RequestBody Feedback feedback) {
+        feedbackService.saveFeedback(feedback);
+        return new ResponseEntity<>(feedback, HttpStatus.CREATED);
+    }
+
+    @GetMapping("feedback/{id}")
+    public ResponseEntity<Feedback> getFeedbackById(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        return new ResponseEntity<>(feedback, HttpStatus.OK);
+    }
+
+    @GetMapping("feedbacks")
+    public ResponseEntity<List<Feedback>> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+        return new ResponseEntity<>(feedbacks, HttpStatus.OK);
+    }
+
+    @DeleteMapping("feedback/{id}")
+    public ResponseEntity<Feedback> deleteFeedback(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        feedbackService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("feedback/{id}")
+    public ResponseEntity<Feedback> updateFeedback(@PathVariable("id") Feedback feedbackFromDB,
+                                                   @RequestBody Feedback feedback) {
+        BeanUtils.copyProperties(feedback, feedbackFromDB, "id", "createdDate");
+        feedbackService.saveFeedback(feedbackFromDB);
+        return new ResponseEntity<>(feedbackFromDB, HttpStatus.OK);
+    }
 }

@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
         if (user.getUsername() == null || user.getPassword() == null) {
             throw new BodyIsNullException("User", "username, password");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         log.info("IN UserServiceImpl saveUser - user: {} successfully saved", savedUser);
         return savedUser;

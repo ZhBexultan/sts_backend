@@ -245,8 +245,11 @@ public class AdminRestControllerV1 {
     }
 
     @GetMapping("blog/{id}")
-    public ResponseEntity getBlogById(@PathVariable Long id) {
-        Blog blog = blogService.getBlogById(id);
+    public ResponseEntity getBlogById(@PathVariable Long id,
+                                      HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("current_user");
+        Blog blog = blogService.getBlogById(id, user);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
         return new ResponseEntity<>(blogDto, HttpStatus.OK);

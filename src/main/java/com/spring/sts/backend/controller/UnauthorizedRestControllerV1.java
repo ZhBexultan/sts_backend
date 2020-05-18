@@ -3,6 +3,7 @@ package com.spring.sts.backend.controller;
 import com.spring.sts.backend.dto.*;
 import com.spring.sts.backend.entity.*;
 import com.spring.sts.backend.service.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,17 @@ public class UnauthorizedRestControllerV1 {
     @Autowired
     private ImageBlogService imageBlogService;
 
+    @Autowired
+    private FeedbackService feedbackService;
+
     /****************************************  USER SERVICE  ****************************************/
     @PostMapping("user")
     public ResponseEntity addUser(@RequestBody User user) {
         user.setFirstName("User@"+RandomizerUser.generate());
         user.setLastName("Anonymous");
         user.setRole(Role.ROLE_USER);
+        user.setFirebaseId("anon_user");
+        user.setImageUrl("https://firebasestorage.googleapis.com/v0/b/soul-to-soul.appspot.com/o/Kids/uncertainty.svg?alt=media&token=f3749f28-7f54-4bbd-bcbd-11c906084fab");
         userService.register(user);
         UserDto userDto = UserDto.fromUser(user);
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
@@ -146,10 +152,48 @@ public class UnauthorizedRestControllerV1 {
 
     @GetMapping("blog/{id}")
     public ResponseEntity getBlogById(@PathVariable Long id) {
-        Blog blog = blogService.getBlogById(id);
+        User user = new User();
+        user.setId(0L);
+        user.setRole(Role.ROLE_USER);
+        Blog blog = blogService.getBlogById(id, user);
         List<ImageBlog> images = imageBlogService.getImageBlogsByBlogId(blog.getId());
         BlogDto blogDto = BlogDto.fromBlog(blog, images);
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
+    }
+
+
+    /****************************************  FEEDBACK SERVICE  ****************************************/
+    @PostMapping("feedback")
+    public ResponseEntity<Feedback> addFeedback(@RequestBody Feedback feedback) {
+        feedbackService.saveFeedback(feedback);
+        return new ResponseEntity<>(feedback, HttpStatus.CREATED);
+    }
+
+    @GetMapping("feedback/{id}")
+    public ResponseEntity<Feedback> getFeedbackById(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        return new ResponseEntity<>(feedback, HttpStatus.OK);
+    }
+
+    @GetMapping("feedbacks")
+    public ResponseEntity<List<Feedback>> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+        return new ResponseEntity<>(feedbacks, HttpStatus.OK);
+    }
+
+    @DeleteMapping("feedback/{id}")
+    public ResponseEntity<Feedback> deleteFeedback(@PathVariable Long id) {
+        Feedback feedback = feedbackService.findById(id);
+        feedbackService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("feedback/{id}")
+    public ResponseEntity<Feedback> updateFeedback(@PathVariable("id") Feedback feedbackFromDB,
+                                         @RequestBody Feedback feedback) {
+        BeanUtils.copyProperties(feedback, feedbackFromDB, "id", "createdDate");
+        feedbackService.saveFeedback(feedbackFromDB);
+        return new ResponseEntity<>(feedbackFromDB, HttpStatus.OK);
     }
 
 }

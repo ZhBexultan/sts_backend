@@ -40,6 +40,9 @@ public class Blog extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "comment", length = 1024)
+    private String comment;
+
     @ManyToMany(mappedBy = "blogs")
     private Set<Tag> tags = new HashSet<>();
 

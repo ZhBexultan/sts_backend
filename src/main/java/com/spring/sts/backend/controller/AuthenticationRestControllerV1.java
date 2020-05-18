@@ -56,30 +56,10 @@ public class AuthenticationRestControllerV1 {
             result.put("username", username);
             result.put("token", token);
             result.put("user", user.getRole().getIndex());
+            result.put("image", user.getImageUrl());
             return ResponseEntity.ok(result);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
-    }
-
-    @GetMapping("logout")
-    public ResponseEntity logout(HttpServletRequest request,
-                                 HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie c: cookies) {
-                if (c.getName().equals("user_token")) {
-                    c.setMaxAge(0);
-                    response.addCookie(c);
-                }
-            }
-        }
-        HttpSession session = request.getSession();
-        if (session != null) {
-            session.invalidate();
-        }
-        Map<Object, Object> result = new HashMap<>();
-        result.put("url", "/");
-        return ResponseEntity.ok(result);
     }
 }

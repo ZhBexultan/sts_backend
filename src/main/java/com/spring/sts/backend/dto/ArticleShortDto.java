@@ -18,6 +18,7 @@ public class ArticleShortDto {
     private Long problemId;
     private String title;
     private String shortContent;
+    private boolean isBlog;
     private LocalDateTime createdDate;
     private ImageArticleDto image;
 
@@ -33,6 +34,7 @@ public class ArticleShortDto {
         articleShortDto.setProblemId(article.getProblemId());
         articleShortDto.setTitle(article.getTitle());
         articleShortDto.setShortContent(article.getShortContent());
+        articleShortDto.setBlog(article.isBlog());
         articleShortDto.setCreatedDate(article.getCreatedDate());
         articleShortDto.setImage(image);
         return  articleShortDto;

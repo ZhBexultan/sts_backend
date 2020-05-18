@@ -51,4 +51,16 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(errors, status);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<CustomErrorResponse> springHandleAccessDenied(HttpServletResponse response,
+                                                                             Exception e,
+                                                                             WebRequest request) throws IOException {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        CustomErrorResponse errors = new CustomErrorResponse();
+        errors.setTimestamp(LocalDateTime.now());
+        errors.setMessage(e.getMessage());
+        errors.setStatus(status.value());
+        return new ResponseEntity<>(errors, status);
+    }
+
 }
