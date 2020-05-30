@@ -5,9 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -17,9 +16,15 @@ import javax.persistence.Table;
 @Table(name = "sts_message")
 public class Message extends BaseEntity {
 
-    @Column(name = "message")
-    private String message;
-    @Column(name = "from_login")
-    private String fromLogin;
+    @Column(name = "content")
+    private String content;
+    @ManyToOne
+    @JoinColumn(name = "from_id")
+    private User fromUser;
+    @ManyToOne
+    @JoinColumn(name = "to_id")
+    private User toUser;
+    @Column(name = "send_date")
+    private LocalDateTime sendDate;
 
 }
