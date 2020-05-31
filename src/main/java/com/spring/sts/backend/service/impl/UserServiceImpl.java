@@ -54,6 +54,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String getRandomModerator() {
+        String username = userRepository.findRandomModerator();
+        log.info("IN UserServiceImpl getRandomModerator - user username: {}", username);
+        return username;
+    }
+
+    @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
         log.info("IN UserServiceImpl delete - user with id: {} successfully deleted", id);

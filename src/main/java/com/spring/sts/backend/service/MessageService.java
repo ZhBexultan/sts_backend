@@ -10,4 +10,7 @@ public interface MessageService {
 
     Message saveMessage(Message message);
 
+    List<Message> getMessagesByFromUserOrToUser(String fromUser, String toUser);
+
+    String findToUserByFromUser(String fromUser);
 }

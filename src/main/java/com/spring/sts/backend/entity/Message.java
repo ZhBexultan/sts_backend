@@ -18,13 +18,11 @@ public class Message extends BaseEntity {
 
     @Column(name = "content")
     private String content;
-    @ManyToOne
-    @JoinColumn(name = "from_id")
-    private User fromUser;
-    @ManyToOne
-    @JoinColumn(name = "to_id")
-    private User toUser;
-    @Column(name = "send_date")
-    private LocalDateTime sendDate;
+    @Column(name = "from_id")
+    private String fromUser;
+    @Column(name = "to_id")
+    private String toUser;
+    @Column(name = "send_time")
+    private LocalDateTime sendTime;
 
 }
