@@ -10,7 +10,9 @@ public interface MessageService {
 
     Message saveMessage(Message message);
 
-    List<Message> getMessagesByFromUserOrToUser(String fromUser, String toUser);
+    List<Message> getMessagesByFromUserAndToUser(String fromUser, String toUser);
 
     String findToUserByFromUser(String fromUser);
+
+    List<Message> findModeratorInterlocutor(String moderator);
 }

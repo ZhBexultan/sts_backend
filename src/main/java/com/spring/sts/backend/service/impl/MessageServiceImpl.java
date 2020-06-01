@@ -29,8 +29,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesByFromUserOrToUser(String fromUser, String toUser) {
-        List<Message> messages = messageRepository.findByFromUserOrToUser(fromUser, toUser);
+    public List<Message> getMessagesByFromUserAndToUser(String fromUser, String toUser) {
+        List<Message> messages = messageRepository.findByFromUserAndToUser(fromUser, toUser);
         log.info("IN MessageServiceImpl getMessagesByFromUserOrToUser - return messages: {} ", messages);
         return messages;
     }
@@ -42,5 +42,11 @@ public class MessageServiceImpl implements MessageService {
         return toUser;
     }
 
+    @Override
+    public List<Message> findModeratorInterlocutor(String moderator) {
+        List<Message> interlocutors = messageRepository.findModeratorInterlocutor(moderator);
+        log.info("IN MessageServiceImpl findModeratorInterlocutor - return messages: {} ", interlocutors);
+        return interlocutors;
+    }
 
 }

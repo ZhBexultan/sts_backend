@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     @Query(
-            value = "SELECT username FROM sts_user WHERE role = 'ROLE_MODERATOR' AND ORDER BY random() LIMIT 1",
+            value = "SELECT username FROM sts_user WHERE role = 'ROLE_MODERATOR' ORDER BY random() LIMIT 1",
             nativeQuery = true
     )
     String findRandomModerator();
