@@ -16,7 +16,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<postgresql.connector.version>42.2.12</postgresql.connector.version>
+		<postgresql.connector.version>42.2.25</postgresql.connector.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 	</properties>
 
